@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -14,10 +14,17 @@ import ReactFlow, {
 } from "reactflow";
 
 import "reactflow/dist/style.css";
+import { customNodeTypes } from "./constants/customNodeTypes";
 
 const initialNodes: Node[] = [
   { id: "1", position: { x: 0, y: 0 }, data: { label: "Decision Node" } },
   { id: "2", position: { x: 0, y: 100 }, data: { label: "Chance Node" } },
+  {
+    id: "3",
+    type: "textUpdater",
+    position: { x: 0, y: 200 },
+    data: { value: 123 },
+  },
 ];
 
 const initalEdges: Edge[] = [
@@ -34,9 +41,12 @@ function App() {
     [setEdges]
   );
 
+  const nodeTypes = useMemo(() => customNodeTypes, []);
+
   return (
     <div className="w-screen h-screen">
       <ReactFlow
+        nodeTypes={nodeTypes}
         nodes={nodes}
         edges={edges}
         onConnect={onConnect}
