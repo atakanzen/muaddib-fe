@@ -13,8 +13,8 @@ import ReactFlow, {
   useNodesState,
 } from "reactflow";
 
-import "reactflow/dist/style.css";
 import { customNodeTypes } from "./constants/customNodeTypes";
+import { customEdgeTypes } from "./constants/customEdgeTypes";
 
 const initialNodes: Node[] = [
   { id: "1", position: { x: 0, y: 0 }, data: { label: "Decision Node" } },
@@ -28,7 +28,7 @@ const initialNodes: Node[] = [
 ];
 
 const initalEdges: Edge[] = [
-  { id: "e1-2", source: "1", target: "2", animated: true },
+  { type: "customEdge", id: "e1-2", source: "1", target: "2" },
 ];
 
 function App() {
@@ -37,16 +37,18 @@ function App() {
 
   const onConnect: OnConnect = useCallback(
     (connection) =>
-      setEdges((eds) => addEdge({ ...connection, animated: true }, eds)),
+      setEdges((eds) => addEdge({ ...connection, type: "customEdge" }, eds)),
     [setEdges]
   );
 
   const nodeTypes = useMemo(() => customNodeTypes, []);
+  const edgeTypes = useMemo(() => customEdgeTypes, []);
 
   return (
     <div className="w-screen h-screen">
       <ReactFlow
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         nodes={nodes}
         edges={edges}
         onConnect={onConnect}
