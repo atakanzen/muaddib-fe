@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { Handle, NodeProps, Position } from "reactflow";
+import { Handle, NodeProps, Position } from "@xyflow/react";
 
 const TextUpdaterNode = (_props: NodeProps) => {
   const onChange = useCallback((evt: React.ChangeEvent<HTMLInputElement>) => {

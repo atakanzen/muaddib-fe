@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
-import ReactFlow, {
+import {
+  ReactFlow,
   Background,
   BackgroundVariant,
   Controls,
@@ -11,25 +12,19 @@ import ReactFlow, {
   addEdge,
   useEdgesState,
   useNodesState,
-} from "reactflow";
+} from "@xyflow/react";
 
 import { customNodeTypes } from "./constants/customNodeTypes";
 import { customEdgeTypes } from "./constants/customEdgeTypes";
 
 const initialNodes: Node[] = [
-  { id: "1", position: { x: 0, y: 0 }, data: { label: "Decision Node" } },
-  { id: "2", position: { x: 0, y: 100 }, data: { label: "Chance Node" } },
-  {
-    id: "3",
-    type: "textUpdater",
-    position: { x: 0, y: 200 },
-    data: { value: 123 },
-  },
+  { id: "1", position: { x: 0, y: 0 }, type: "decisionNode", data: {} },
+  { id: "2", position: { x: 100, y: 75 }, type: "chanceNode", data: {} },
+  { id: "3", position: { x: 100, y: 0 }, type: "chanceNode", data: {} },
+  { id: "4", position: { x: 100, y: -75 }, type: "chanceNode", data: {} },
 ];
 
-const initalEdges: Edge[] = [
-  { type: "customEdge", id: "e1-2", source: "1", target: "2" },
-];
+const initalEdges: Edge[] = [];
 
 function App() {
   const [nodes, _setNodes, onNodesChange] = useNodesState<Node>(initialNodes);
@@ -37,7 +32,7 @@ function App() {
 
   const onConnect: OnConnect = useCallback(
     (connection) =>
-      setEdges((eds) => addEdge({ ...connection, type: "customEdge" }, eds)),
+      setEdges((eds) => addEdge({ ...connection, type: "bezierEdge" }, eds)),
     [setEdges]
   );
 
@@ -58,7 +53,7 @@ function App() {
       >
         <Background
           variant={BackgroundVariant.Dots}
-          color="#CCC"
+          color="rgba(10,10,10, 0.5)"
           gap={12}
           size={1}
         />
