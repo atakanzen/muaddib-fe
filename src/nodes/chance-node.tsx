@@ -13,7 +13,7 @@ export const ChanceNode = (_props: NodeProps) => {
         <Handle type="source" position={Position.Right} />
       </div>
       <NodeToolbar isVisible position={Position.Bottom}>
-        <label className="font-bold backdrop-blur">Chance Node</label>
+        <label className="font-bold">Chance Node</label>
       </NodeToolbar>
     </>
   );
