@@ -7,10 +7,12 @@ import {
   ReactFlow,
   useReactFlow,
 } from "@xyflow/react";
-import { MouseEventHandler, useMemo } from "react";
+import { MouseEvent, MouseEventHandler, useMemo } from "react";
 
+import ContextMenu from "./components/contextMenu";
 import { customEdgeTypes } from "./constants/customEdgeTypes";
 import { customNodeTypes } from "./constants/customNodeTypes";
+import useContextMenu from "./hooks/useContextMenu";
 import {
   onConnect,
   onEdgesChange,
@@ -25,6 +27,7 @@ function App() {
   const nodes = useAppSelector(selectNodes);
   const edges = useAppSelector(selectEdges);
   const dispatch = useAppDispatch();
+  const { menuVisible, menuPosition, showMenu } = useContextMenu();
 
   const nodeTypes = useMemo(() => customNodeTypes, []);
   const edgeTypes = useMemo(() => customEdgeTypes, []);
@@ -32,6 +35,12 @@ function App() {
   const handleLogCurrentState: MouseEventHandler<HTMLElement> = (e) => {
     e.preventDefault();
     console.log(instance.toObject());
+  };
+
+  const handleOnContextMenu = (e: MouseEvent | globalThis.MouseEvent) => {
+    e.preventDefault();
+
+    showMenu(e.clientX, e.clientY);
   };
 
   return (
@@ -44,8 +53,12 @@ function App() {
         onConnect={(conn) => dispatch(onConnect(conn))}
         onNodesChange={(ch) => dispatch(onNodesChange(ch))}
         onEdgesChange={(ch) => dispatch(onEdgesChange(ch))}
+        onPaneContextMenu={handleOnContextMenu}
         fitView
       >
+        {menuVisible && (
+          <ContextMenu menuVisible={menuVisible} menuPosition={menuPosition} />
+        )}
         <Background
           variant={BackgroundVariant.Dots}
           color="rgba(10,10,10, 0.5)"
