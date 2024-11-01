@@ -13,15 +13,12 @@ const useContextMenu = () => {
   });
 
   const showMenu = (x: number, y: number) => {
-    console.log("Show menu called, menu visible before: ", menuVisible);
     setMenuPosition({ x, y });
     setMenuVisible(true);
-    console.log("Show menu called, menu visible after: ", menuVisible);
   };
 
   const hideMenu = () => {
     setMenuVisible(false);
-    console.log("HIDE MENU CALLED, menuVisible: ", menuVisible);
   };
 
   return { menuVisible, menuPosition, showMenu, hideMenu };

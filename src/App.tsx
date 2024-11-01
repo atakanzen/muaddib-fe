@@ -7,7 +7,13 @@ import {
   ReactFlow,
   useReactFlow,
 } from "@xyflow/react";
-import { MouseEvent, MouseEventHandler, useMemo } from "react";
+import {
+  MouseEvent,
+  MouseEventHandler,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 
 import ContextMenu from "./components/contextMenu";
 import { customEdgeTypes } from "./constants/customEdgeTypes";
@@ -23,11 +29,12 @@ import {
 import { useAppDispatch, useAppSelector } from "./state/hooks";
 
 function App() {
+  const rfRef = useRef<HTMLDivElement | null>(null);
   const instance = useReactFlow();
   const nodes = useAppSelector(selectNodes);
   const edges = useAppSelector(selectEdges);
   const dispatch = useAppDispatch();
-  const { menuVisible, menuPosition, showMenu } = useContextMenu();
+  const { menuVisible, showMenu, hideMenu, menuPosition } = useContextMenu();
 
   const nodeTypes = useMemo(() => customNodeTypes, []);
   const edgeTypes = useMemo(() => customEdgeTypes, []);
@@ -39,13 +46,15 @@ function App() {
 
   const handleOnContextMenu = (e: MouseEvent | globalThis.MouseEvent) => {
     e.preventDefault();
-
     showMenu(e.clientX, e.clientY);
   };
+
+  const onPaneClick = useCallback(() => hideMenu(), [hideMenu]);
 
   return (
     <div className="w-screen h-screen">
       <ReactFlow
+        ref={rfRef}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         nodes={nodes}
@@ -54,11 +63,10 @@ function App() {
         onNodesChange={(ch) => dispatch(onNodesChange(ch))}
         onEdgesChange={(ch) => dispatch(onEdgesChange(ch))}
         onPaneContextMenu={handleOnContextMenu}
+        onPaneClick={onPaneClick}
         fitView
       >
-        {menuVisible && (
-          <ContextMenu menuVisible={menuVisible} menuPosition={menuPosition} />
-        )}
+        {menuVisible && <ContextMenu menuPosition={menuPosition} />}
         <Background
           variant={BackgroundVariant.Dots}
           color="rgba(10,10,10, 0.5)"

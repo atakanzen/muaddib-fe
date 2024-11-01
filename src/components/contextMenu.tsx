@@ -1,34 +1,29 @@
-import { useEffect, useRef } from "react";
+import { useReactFlow } from "@xyflow/react";
+import { useCallback, useRef } from "react";
 import useContextMenu, { MenuPosition } from "../hooks/useContextMenu";
 
 interface ContextMenuProps {
   menuPosition: MenuPosition;
-  menuVisible: boolean;
 }
 
-const ContextMenu = ({ menuPosition, menuVisible }: ContextMenuProps) => {
-  const { hideMenu } = useContextMenu();
+const ContextMenu = ({ menuPosition }: ContextMenuProps) => {
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const { addNodes } = useReactFlow();
+  const { hideMenu } = useContextMenu();
 
-  // TODO: This is not working yet.
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
+  const handleDecisionNode = useCallback(
+    (e: React.MouseEvent<HTMLLIElement | null>) => {
       e.preventDefault();
-      if (menuRef.current) {
-        console.log("ICERDEYIm");
-        hideMenu();
-      }
-    };
-
-    console.log("menuRef.current: ", menuRef.current);
-    console.log("menuVisible: ", menuVisible);
-
-    document.addEventListener("mousedown", handleOutsideClick);
-
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, [hideMenu, menuVisible]);
+      hideMenu();
+      addNodes({
+        id: crypto.randomUUID(),
+        position: { x: menuPosition.x, y: menuPosition.y },
+        type: "decisionNode",
+        data: {},
+      });
+    },
+    [addNodes, hideMenu, menuPosition.x, menuPosition.y]
+  );
 
   return (
     <div
@@ -41,7 +36,9 @@ const ContextMenu = ({ menuPosition, menuVisible }: ContextMenuProps) => {
     >
       <span className="font-bold">Context Menu</span>
       <ul className="flex flex-col gap-2 mt-4 items-start justify-center">
-        <li className="border-b cursor-pointer">Decision Node</li>
+        <li onClick={handleDecisionNode} className="border-b cursor-pointer">
+          Decision Node
+        </li>
         <li className="border-b cursor-pointer">Chance Node</li>
         <li className="border-b cursor-pointer">Endpoint Node</li>
       </ul>
