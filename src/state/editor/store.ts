@@ -19,9 +19,24 @@ interface EditorState {
 const initialState: EditorState = {
   nodes: [
     { id: "1", position: { x: 0, y: 0 }, type: "decisionNode", data: {} },
-    { id: "2", position: { x: 100, y: 75 }, type: "chanceNode", data: {} },
-    { id: "3", position: { x: 100, y: 0 }, type: "chanceNode", data: {} },
-    { id: "4", position: { x: 100, y: -75 }, type: "chanceNode", data: {} },
+    {
+      id: "2",
+      position: { x: 100, y: 75 },
+      type: "chanceNode",
+      data: { probability: 33.33 },
+    },
+    {
+      id: "3",
+      position: { x: 100, y: 0 },
+      type: "chanceNode",
+      data: { probability: 33.33 },
+    },
+    {
+      id: "4",
+      position: { x: 100, y: -75 },
+      type: "chanceNode",
+      data: { probability: 33.33 },
+    },
     { id: "5", position: { x: 300, y: 85 }, type: "endpointNode", data: {} },
     { id: "6", position: { x: 300, y: 15 }, type: "endpointNode", data: {} },
     { id: "7", position: { x: 300, y: -65 }, type: "endpointNode", data: {} },
