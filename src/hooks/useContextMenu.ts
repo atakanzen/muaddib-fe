@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 export interface MenuPosition {
   x: number;
@@ -12,14 +12,14 @@ const useContextMenu = () => {
     y: 0,
   });
 
-  const showMenu = (x: number, y: number) => {
+  const showMenu = useCallback((x: number, y: number) => {
     setMenuPosition({ x, y });
     setMenuVisible(true);
-  };
+  }, []);
 
-  const hideMenu = () => {
+  const hideMenu = useCallback(() => {
     setMenuVisible(false);
-  };
+  }, []);
 
   return { menuVisible, menuPosition, showMenu, hideMenu };
 };

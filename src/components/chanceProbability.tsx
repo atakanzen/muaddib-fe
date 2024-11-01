@@ -7,7 +7,7 @@ const ChanceProbability = ({ probability }: ChanceProbabilityProps) => {
     <div className="relative max-w-20">
       <input
         type="number"
-        className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none w-full  py-2 px-3 bg-white border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none w-full  py-2 px-3 bg-white border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
         defaultValue={probability}
         max={100}
       />

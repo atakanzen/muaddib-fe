@@ -14,6 +14,10 @@ import { RootState } from "../store";
 interface EditorState {
   nodes: Node[];
   edges: Edge[];
+  paneContextMenu: {
+    visible: boolean;
+    position: { x: number; y: number };
+  };
 }
 
 const initialState: EditorState = {
@@ -49,6 +53,10 @@ const initialState: EditorState = {
     { id: "3-6", source: "3", target: "6", animated: true },
     { id: "2-5", source: "2", target: "5", animated: true },
   ],
+  paneContextMenu: {
+    visible: false,
+    position: { x: 0, y: 0 },
+  },
 };
 
 export const editorSlice = createSlice({
@@ -64,12 +72,38 @@ export const editorSlice = createSlice({
     onConnect: (state, action: PayloadAction<Connection>) => {
       state.edges = addEdge(action.payload, state.edges);
     },
+    addNode: (state, action: PayloadAction<Node>) => {
+      state.nodes.push(action.payload);
+    },
+    showPaneContextMenu: (
+      state,
+      action: PayloadAction<{ x: number; y: number }>
+    ) => {
+      const { x, y } = action.payload;
+      state.paneContextMenu.position.x = x;
+      state.paneContextMenu.position.y = y;
+      state.paneContextMenu.visible = true;
+    },
+    hidePaneContextMenu: (state) => {
+      state.paneContextMenu.visible = false;
+    },
   },
 });
 
-export const { onConnect, onEdgesChange, onNodesChange } = editorSlice.actions;
+export const {
+  onConnect,
+  onEdgesChange,
+  onNodesChange,
+  addNode,
+  showPaneContextMenu,
+  hidePaneContextMenu,
+} = editorSlice.actions;
 
 export const selectNodes = (state: RootState) => state.editor.nodes;
 export const selectEdges = (state: RootState) => state.editor.edges;
+export const selectPaneContextVisible = (state: RootState) =>
+  state.editor.paneContextMenu.visible;
+export const selectPaneContextPosition = (state: RootState) =>
+  state.editor.paneContextMenu.position;
 
 export default editorSlice.reducer;

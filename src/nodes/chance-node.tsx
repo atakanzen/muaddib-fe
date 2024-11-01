@@ -8,10 +8,14 @@ type ChanceNodeProps = {
   };
 } & Omit<NodeProps, "data">;
 
-export const ChanceNode = ({ data }: ChanceNodeProps) => {
+export const ChanceNode = ({ data, selected }: ChanceNodeProps) => {
   return (
     <>
-      <div className="p-4 flex items-center justify-center rounded-full bg-white border border-black">
+      <div
+        className={`p-4 flex items-center justify-center rounded-full bg-white border border-black ${
+          selected && "border-orange-500"
+        }`}
+      >
         <ConnectionLimitHandle
           type="target"
           position={Position.Left}

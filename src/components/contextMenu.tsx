@@ -1,46 +1,81 @@
 import { useReactFlow } from "@xyflow/react";
-import { useCallback, useRef } from "react";
-import useContextMenu, { MenuPosition } from "../hooks/useContextMenu";
+import { useCallback } from "react";
+import {
+  CHANCE_NODE_TYPE,
+  DECISION_NODE_TYPE,
+  ENDPOINT_NODE_TYPE,
+} from "../constants/customNodeTypes";
+import {
+  addNode,
+  hidePaneContextMenu,
+  selectPaneContextPosition,
+} from "../state/editor/store";
+import { useAppDispatch, useAppSelector } from "../state/hooks";
 
-interface ContextMenuProps {
-  menuPosition: MenuPosition;
-}
+const ContextMenu = () => {
+  const contextMenuPosition = useAppSelector(selectPaneContextPosition);
+  const { screenToFlowPosition } = useReactFlow();
+  const dispatch = useAppDispatch();
 
-const ContextMenu = ({ menuPosition }: ContextMenuProps) => {
-  const menuRef = useRef<HTMLDivElement | null>(null);
-  const { addNodes } = useReactFlow();
-  const { hideMenu } = useContextMenu();
-
-  const handleDecisionNode = useCallback(
-    (e: React.MouseEvent<HTMLLIElement | null>) => {
+  const handleAddNode = useCallback(
+    (e: React.MouseEvent<HTMLLIElement | null>, nodeType: string) => {
       e.preventDefault();
-      hideMenu();
-      addNodes({
-        id: crypto.randomUUID(),
-        position: { x: menuPosition.x, y: menuPosition.y },
-        type: "decisionNode",
-        data: {},
-      });
+      dispatch(hidePaneContextMenu());
+
+      const canvas = document.querySelector(".react-flow__renderer");
+      if (canvas) {
+        const canvasRect = canvas.getBoundingClientRect();
+        const adjustedPosition = {
+          x: contextMenuPosition.x - canvasRect.left,
+          y: contextMenuPosition.y - canvasRect.top,
+        };
+        const { x, y } = screenToFlowPosition(adjustedPosition);
+        dispatch(
+          addNode({
+            id: crypto.randomUUID(),
+            data: {},
+            type: nodeType,
+            position: { x, y },
+          })
+        );
+      }
     },
-    [addNodes, hideMenu, menuPosition.x, menuPosition.y]
+    [
+      dispatch,
+      contextMenuPosition.x,
+      contextMenuPosition.y,
+      screenToFlowPosition,
+    ]
   );
 
   return (
     <div
-      ref={menuRef}
       className="absolute h-64 w-44 bg-white border rounded z-50 p-2 shadow-funky"
       style={{
-        top: `${menuPosition.y}px`,
-        left: `${menuPosition.x}px`,
+        top: `${contextMenuPosition.y}px`,
+        left: `${contextMenuPosition.x}px`,
       }}
     >
       <span className="font-bold">Context Menu</span>
       <ul className="flex flex-col gap-2 mt-4 items-start justify-center">
-        <li onClick={handleDecisionNode} className="border-b cursor-pointer">
+        <li
+          onClick={(e) => handleAddNode(e, DECISION_NODE_TYPE)}
+          className="border-b cursor-pointer hover:bg-gray-200 w-full"
+        >
           Decision Node
         </li>
-        <li className="border-b cursor-pointer">Chance Node</li>
-        <li className="border-b cursor-pointer">Endpoint Node</li>
+        <li
+          onClick={(e) => handleAddNode(e, CHANCE_NODE_TYPE)}
+          className="border-b cursor-pointer hover:bg-gray-200 w-full"
+        >
+          Chance Node
+        </li>
+        <li
+          onClick={(e) => handleAddNode(e, ENDPOINT_NODE_TYPE)}
+          className="border-b cursor-pointer hover:bg-gray-200 w-full"
+        >
+          Endpoint Node
+        </li>
       </ul>
     </div>
   );

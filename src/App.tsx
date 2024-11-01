@@ -18,13 +18,15 @@ import {
 import ContextMenu from "./components/contextMenu";
 import { customEdgeTypes } from "./constants/customEdgeTypes";
 import { customNodeTypes } from "./constants/customNodeTypes";
-import useContextMenu from "./hooks/useContextMenu";
 import {
+  hidePaneContextMenu,
   onConnect,
   onEdgesChange,
   onNodesChange,
   selectEdges,
   selectNodes,
+  selectPaneContextVisible,
+  showPaneContextMenu,
 } from "./state/editor/store";
 import { useAppDispatch, useAppSelector } from "./state/hooks";
 
@@ -34,7 +36,7 @@ function App() {
   const nodes = useAppSelector(selectNodes);
   const edges = useAppSelector(selectEdges);
   const dispatch = useAppDispatch();
-  const { menuVisible, showMenu, hideMenu, menuPosition } = useContextMenu();
+  const paneContextMenuVisible = useAppSelector(selectPaneContextVisible);
 
   const nodeTypes = useMemo(() => customNodeTypes, []);
   const edgeTypes = useMemo(() => customEdgeTypes, []);
@@ -46,10 +48,23 @@ function App() {
 
   const handleOnContextMenu = (e: MouseEvent | globalThis.MouseEvent) => {
     e.preventDefault();
-    showMenu(e.clientX, e.clientY);
+    const canvas = document.querySelector(".react-flow__renderer"); // Adjust to your canvas element selector
+    if (canvas) {
+      const canvasRect = canvas.getBoundingClientRect();
+      const adjustedPosition = {
+        x: e.clientX - canvasRect.left,
+        y: e.clientY - canvasRect.top,
+      };
+      dispatch(
+        showPaneContextMenu({ x: adjustedPosition.x, y: adjustedPosition.y })
+      );
+    }
   };
 
-  const onPaneClick = useCallback(() => hideMenu(), [hideMenu]);
+  const onPaneClick = useCallback(
+    () => dispatch(hidePaneContextMenu()),
+    [dispatch]
+  );
 
   return (
     <div className="w-screen h-screen">
@@ -66,7 +81,7 @@ function App() {
         onPaneClick={onPaneClick}
         fitView
       >
-        {menuVisible && <ContextMenu menuPosition={menuPosition} />}
+        {paneContextMenuVisible && <ContextMenu />}
         <Background
           variant={BackgroundVariant.Dots}
           color="rgba(10,10,10, 0.5)"
