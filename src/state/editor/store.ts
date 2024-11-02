@@ -9,6 +9,7 @@ import {
   Node,
   NodeChange,
 } from "@xyflow/react";
+import { isChanceNode } from "../../utils/type-guards";
 import { RootState } from "../store";
 
 interface EditorState {
@@ -87,6 +88,39 @@ export const editorSlice = createSlice({
     hidePaneContextMenu: (state) => {
       state.paneContextMenu.visible = false;
     },
+    changeProbabilityForChanceNode: (
+      state,
+      action: PayloadAction<{
+        nodeID: string;
+        probability: number;
+        parentNodeID: string;
+      }>
+    ) => {
+      const { nodeID, probability, parentNodeID } = action.payload;
+      const chanceNode = state.nodes
+        .filter(isChanceNode)
+        .find((cn) => cn.id === nodeID);
+      if (chanceNode) {
+        chanceNode.data.probability = probability;
+
+        const otherChanceNodeIDs = state.edges
+          .filter((e) => e.source === parentNodeID && e.target !== nodeID)
+          .map((cn) => cn.target);
+
+        const remainingProbability = 100 - probability;
+        const dividedProbability =
+          otherChanceNodeIDs.length > 0
+            ? remainingProbability / otherChanceNodeIDs.length
+            : 0;
+
+        otherChanceNodeIDs.forEach((otherNodeID) => {
+          const otherNode = state.nodes.find((n) => n.id === otherNodeID);
+          if (otherNode && isChanceNode(otherNode)) {
+            otherNode.data.probability = dividedProbability;
+          }
+        });
+      }
+    },
   },
 });
 
@@ -97,6 +131,7 @@ export const {
   addNode,
   showPaneContextMenu,
   hidePaneContextMenu,
+  changeProbabilityForChanceNode,
 } = editorSlice.actions;
 
 export const selectNodes = (state: RootState) => state.editor.nodes;
