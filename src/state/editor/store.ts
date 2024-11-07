@@ -11,6 +11,7 @@ import {
 } from "@xyflow/react";
 import { isChanceNode } from "../../utils/type-guards";
 import { RootState } from "../store";
+import { TChanceNode } from "../../nodes/chance-node";
 
 interface EditorState {
   nodes: Node[];
@@ -102,22 +103,41 @@ export const editorSlice = createSlice({
         .find((cn) => cn.id === nodeID);
       if (chanceNode) {
         chanceNode.data.probability = probability;
+        chanceNode.data.isSetByUser = true;
 
         const otherChanceNodeIDs = state.edges
           .filter((e) => e.source === parentNodeID && e.target !== nodeID)
           .map((cn) => cn.target);
 
-        const remainingProbability = 100 - probability;
+        let remainingProbability = 100 - probability;
+        const otherNodes: TChanceNode[] = [];
+
+        // Build array of nodes NOT set by user and calculate remaining possibility 
+        otherChanceNodeIDs.forEach((otherNodeID) => {
+            const otherNode = state.nodes.find((n) => n.id === otherNodeID);
+            
+            if (!otherNode || !isChanceNode(otherNode)) {
+                return;
+            }
+
+            if (otherNode.data.isSetByUser) {
+                remainingProbability -= otherNode.data.probability;
+            } else {
+                otherNodes.push(otherNode);
+            }
+        });
+
+        if (remainingProbability < 0) {
+            console.log('Probabilities do not sum up to 100%');  // TODO: Handle this
+        }
+
         const dividedProbability =
-          otherChanceNodeIDs.length > 0
-            ? remainingProbability / otherChanceNodeIDs.length
+          otherNodes.length > 0
+            ? Math.max(remainingProbability / otherNodes.length, 0)
             : 0;
 
-        otherChanceNodeIDs.forEach((otherNodeID) => {
-          const otherNode = state.nodes.find((n) => n.id === otherNodeID);
-          if (otherNode && isChanceNode(otherNode)) {
+        otherNodes.forEach((otherNode) => {
             otherNode.data.probability = dividedProbability;
-          }
         });
       }
     },

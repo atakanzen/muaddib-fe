@@ -5,6 +5,7 @@ import { ConnectionLimitHandle } from "../handles/connection-limit-handle";
 
 type ChanceNodeData = {
   probability: number;
+  isSetByUser?: boolean;
 };
 
 export type TChanceNode = Node<ChanceNodeData, "chanceNode">;
