@@ -101,45 +101,48 @@ export const editorSlice = createSlice({
       const chanceNode = state.nodes
         .filter(isChanceNode)
         .find((cn) => cn.id === nodeID);
-      if (chanceNode) {
-        chanceNode.data.probability = probability;
-        chanceNode.data.isSetByUser = true;
 
-        const otherChanceNodeIDs = state.edges
-          .filter((e) => e.source === parentNodeID && e.target !== nodeID)
-          .map((cn) => cn.target);
+      if (!chanceNode) {
+        return;
+      }
+      
+      chanceNode.data.probability = probability;
+      chanceNode.data.isSetByUser = true;
 
-        let remainingProbability = 100 - probability;
-        const otherNodes: TChanceNode[] = [];
+      const otherChanceNodeIDs = state.edges
+        .filter((e) => e.source === parentNodeID && e.target !== nodeID)
+        .map((cn) => cn.target);
 
-        // Build array of nodes NOT set by user and calculate remaining possibility 
-        otherChanceNodeIDs.forEach((otherNodeID) => {
-            const otherNode = state.nodes.find((n) => n.id === otherNodeID);
-            
-            if (!otherNode || !isChanceNode(otherNode)) {
-                return;
-            }
+      let remainingProbability = 100 - probability;
+      const otherNodes: TChanceNode[] = [];
 
-            if (otherNode.data.isSetByUser) {
-                remainingProbability -= otherNode.data.probability;
-            } else {
-                otherNodes.push(otherNode);
-            }
-        });
+      // Build array of nodes NOT set by user and calculate remaining possibility 
+      otherChanceNodeIDs.forEach((otherNodeID) => {
+        const otherNode = state.nodes.find((n) => n.id === otherNodeID);
 
-        if (remainingProbability < 0) {
-            console.log('Probabilities do not sum up to 100%');  // TODO: Handle this
+        if (!otherNode || !isChanceNode(otherNode)) {
+          return;
         }
 
-        const dividedProbability =
-          otherNodes.length > 0
-            ? Math.max(remainingProbability / otherNodes.length, 0)
-            : 0;
+        if (otherNode.data.isSetByUser) {
+          remainingProbability -= otherNode.data.probability;
+        } else {
+          otherNodes.push(otherNode);
+        }
+      });
 
-        otherNodes.forEach((otherNode) => {
-            otherNode.data.probability = dividedProbability;
-        });
+      if (remainingProbability < 0) {
+        console.log('Probabilities do not sum up to 100%');  // TODO: Handle this
       }
+
+      const dividedProbability =
+        otherNodes.length > 0
+          ? Math.max(remainingProbability / otherNodes.length, 0)
+          : 0;
+
+      otherNodes.forEach((otherNode) => {
+        otherNode.data.probability = dividedProbability;
+      });
     },
   },
 });
