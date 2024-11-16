@@ -16,7 +16,7 @@ const ChanceProbabilityInput = ({
 
   const parentNodeID = useParentNodeID(nodeID) ?? "";
 
-  const handleOnChanceProbabilityInput = useCallback(
+  const handleOnChangeProbabilityInput = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       dispatch(
         changeProbabilityForChanceNode({
@@ -36,7 +36,7 @@ const ChanceProbabilityInput = ({
         className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none w-full  py-2 px-3 bg-white border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
         value={probability}
         max={100}
-        onChange={handleOnChanceProbabilityInput}
+        onChange={handleOnChangeProbabilityInput}
       />
       <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">
         %

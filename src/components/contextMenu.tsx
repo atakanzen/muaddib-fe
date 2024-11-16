@@ -4,6 +4,7 @@ import {
   CHANCE_NODE_TYPE,
   DECISION_NODE_TYPE,
   ENDPOINT_NODE_TYPE,
+  TEXT_NODE_TYPE,
 } from "../constants/customNodeTypes";
 import {
   addNode,
@@ -18,7 +19,11 @@ const ContextMenu = () => {
   const dispatch = useAppDispatch();
 
   const handleAddNode = useCallback(
-    (e: React.MouseEvent<HTMLLIElement | null>, nodeType: string) => {
+    (
+      e: React.MouseEvent<HTMLLIElement | null>,
+      nodeType: string,
+      nodeData?: Record<string, unknown>
+    ) => {
       e.preventDefault();
       dispatch(hidePaneContextMenu());
 
@@ -33,7 +38,7 @@ const ContextMenu = () => {
         dispatch(
           addNode({
             id: crypto.randomUUID(),
-            data: {},
+            data: nodeData ?? {},
             type: nodeType,
             position: { x, y },
           })
@@ -75,6 +80,12 @@ const ContextMenu = () => {
           className="border-b cursor-pointer hover:bg-gray-200 w-full"
         >
           Endpoint Node
+        </li>
+        <li
+          onClick={(e) => handleAddNode(e, TEXT_NODE_TYPE, { text: "" })}
+          className="border-b cursor-pointer hover:bg-gray-200 w-full"
+        >
+          Text Node
         </li>
       </ul>
     </div>

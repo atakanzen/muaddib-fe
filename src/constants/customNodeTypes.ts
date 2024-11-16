@@ -7,9 +7,10 @@ import TextNode from "../nodes/text-node";
 export const DECISION_NODE_TYPE = "decisionNode";
 export const CHANCE_NODE_TYPE = "chanceNode";
 export const ENDPOINT_NODE_TYPE = "endpointNode";
+export const TEXT_NODE_TYPE = "textNode";
 
 const customNodeTypes: NodeTypes = {
-  textUpdater: TextNode,
+  textNode: TextNode,
   decisionNode: DecisionNode,
   chanceNode: ChanceNode,
   endpointNode: EndpointNode,

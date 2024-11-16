@@ -48,7 +48,7 @@ function App() {
 
   const handleOnContextMenu = (e: MouseEvent | globalThis.MouseEvent) => {
     e.preventDefault();
-    const canvas = document.querySelector(".react-flow__renderer"); // Adjust to your canvas element selector
+    const canvas = document.querySelector(".react-flow__renderer");
     if (canvas) {
       const canvasRect = canvas.getBoundingClientRect();
       const adjustedPosition = {

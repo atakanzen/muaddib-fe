@@ -9,9 +9,9 @@ import {
   Node,
   NodeChange,
 } from "@xyflow/react";
-import { isChanceNode } from "../../utils/type-guards";
-import { RootState } from "../store";
 import { TChanceNode } from "../../nodes/chance-node";
+import { isChanceNode, isTextNode } from "../../utils/type-guards";
+import { RootState } from "../store";
 
 interface EditorState {
   nodes: Node[];
@@ -105,7 +105,7 @@ export const editorSlice = createSlice({
       if (!chanceNode) {
         return;
       }
-      
+
       chanceNode.data.probability = probability;
       chanceNode.data.isSetByUser = true;
 
@@ -116,7 +116,7 @@ export const editorSlice = createSlice({
       let remainingProbability = 100 - probability;
       const otherNodes: TChanceNode[] = [];
 
-      // Build array of nodes NOT set by user and calculate remaining possibility 
+      // Build array of nodes NOT set by user and calculate remaining possibility
       otherChanceNodeIDs.forEach((otherNodeID) => {
         const otherNode = state.nodes.find((n) => n.id === otherNodeID);
 
@@ -132,7 +132,7 @@ export const editorSlice = createSlice({
       });
 
       if (remainingProbability < 0) {
-        console.log('Probabilities do not sum up to 100%');  // TODO: Handle this
+        console.log("Probabilities do not sum up to 100%"); // TODO: Handle this
       }
 
       const dividedProbability =
@@ -143,6 +143,18 @@ export const editorSlice = createSlice({
       otherNodes.forEach((otherNode) => {
         otherNode.data.probability = dividedProbability;
       });
+    },
+    changeInputForTextNode: (
+      state,
+      action: PayloadAction<{ id: string; input: string }>
+    ) => {
+      const { id, input } = action.payload;
+      const textNode = state.nodes.filter(isTextNode).find((n) => n.id === id);
+      if (!textNode) {
+        console.error("text node not found in store");
+        return;
+      }
+      textNode.data.text = input;
     },
   },
 });
@@ -155,6 +167,7 @@ export const {
   showPaneContextMenu,
   hidePaneContextMenu,
   changeProbabilityForChanceNode,
+  changeInputForTextNode,
 } = editorSlice.actions;
 
 export const selectNodes = (state: RootState) => state.editor.nodes;

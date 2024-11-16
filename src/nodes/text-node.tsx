@@ -1,23 +1,34 @@
-import { NodeProps } from "@xyflow/react";
-import React, { useCallback } from "react";
+import { Node, NodeProps } from "@xyflow/react";
+import { ChangeEvent, useCallback } from "react";
+import { changeInputForTextNode } from "../state/editor/store";
+import { useAppDispatch } from "../state/hooks";
 
-const TextNode = (_props: NodeProps) => {
-  const onChange = useCallback((evt: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(evt.target.value);
-  }, []);
+type TextNodeData = {
+  text: string;
+};
+
+export type TTextNode = Node<TextNodeData, "textNode">;
+
+const TextNode = ({ id, data: { text } }: NodeProps<TTextNode>) => {
+  const dispatch = useAppDispatch();
+
+  const handleOnChangeText = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      e.preventDefault();
+      dispatch(changeInputForTextNode({ id: id, input: e.target.value }));
+    },
+    [dispatch, id]
+  );
 
   return (
-    <div className="p-2 bg-white text-black rounded-sm">
-      <div className="flex gap-x-1 items-center">
-        <input
-          type="text"
-          id="text"
-          name="text"
-          onChange={onChange}
-          className="nodrag bg-gray-300 rounded-sm text-black p-1"
-        />
-      </div>
-    </div>
+    <input
+      type="text"
+      id="text"
+      name="text"
+      value={text}
+      onChange={handleOnChangeText}
+      className="bg-transparent border bg-gray-100 border-gray-400  p-1 text-xss"
+    />
   );
 };
 
