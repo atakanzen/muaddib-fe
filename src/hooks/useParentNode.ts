@@ -1,14 +1,14 @@
-import { useReactFlow } from "@xyflow/react";
 import { useMemo } from "react";
+import { selectEdges } from "../state/editor/store";
+import { useAppSelector } from "../state/hooks";
 
 export const useParentNodeID = (childNodeID: string) => {
-  const { getEdges } = useReactFlow();
+  const edges = useAppSelector(selectEdges);
 
   const parentNodeID = useMemo(() => {
-    const edges = getEdges();
     const parentEdge = edges.find((e) => e.target === childNodeID);
     return parentEdge ? parentEdge.source : null;
-  }, [childNodeID, getEdges]);
+  }, [childNodeID, edges]);
 
   return parentNodeID;
 };

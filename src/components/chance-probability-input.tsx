@@ -1,7 +1,5 @@
 import { ChangeEvent, useCallback } from "react";
-import { useParentNodeID } from "../hooks/useParentNode";
-import { changeProbabilityForChanceNode } from "../state/editor/store";
-import { useAppDispatch } from "../state/hooks";
+// import { changeProbabilityForChanceNode } from "../state/editor/store";
 
 interface ChanceProbabilityProps {
   probability: number;
@@ -10,30 +8,31 @@ interface ChanceProbabilityProps {
 
 const ChanceProbabilityInput = ({
   probability,
-  nodeID,
-}: ChanceProbabilityProps) => {
-  const dispatch = useAppDispatch();
+}: // nodeID,
+ChanceProbabilityProps) => {
+  // const dispatch = useAppDispatch();
 
-  const parentNodeID = useParentNodeID(nodeID) ?? "";
+  // const parentNodeID = useParentNodeID(nodeID) ?? "";
 
   const handleOnChangeProbabilityInput = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      dispatch(
-        changeProbabilityForChanceNode({
-          nodeID,
-          probability: Number(e.target.value),
-          parentNodeID: parentNodeID,
-        })
-      );
+      console.log(e.target.value);
+      // dispatch(
+      //   changeProbabilityForChanceNode({
+      //     nodeID,
+      //     probability: Number(e.target.value),
+      //     parentNodeID: parentNodeID,
+      //   })
+      // );
     },
-    [dispatch, nodeID, parentNodeID]
+    []
   );
 
   return (
-    <div className="relative max-w-20">
+    <div className="absolute text-xss w-12 pointer-events-auto">
       <input
         type="number"
-        className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none w-full  py-2 px-3 bg-white border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
+        className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none w-full  py-2 px-3 bg-white border border-gray-300 rounded "
         value={probability}
         max={100}
         onChange={handleOnChangeProbabilityInput}

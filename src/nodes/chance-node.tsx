@@ -1,16 +1,8 @@
-import { Handle, Node, NodeProps, NodeToolbar, Position } from "@xyflow/react";
+import { Handle, NodeProps, Position } from "@xyflow/react";
 import classNames from "classnames";
-import ChanceProbabilityInput from "../components/chance-probability-input";
 import { ConnectionLimitHandle } from "../handles/connection-limit-handle";
 
-type ChanceNodeData = {
-  probability: number;
-  isSetByUser?: boolean;
-};
-
-export type TChanceNode = Node<ChanceNodeData, "chanceNode">;
-
-export const ChanceNode = ({ data, selected, id }: NodeProps<TChanceNode>) => {
+export const ChanceNode = ({ selected }: NodeProps) => {
   return (
     <>
       <div
@@ -23,11 +15,9 @@ export const ChanceNode = ({ data, selected, id }: NodeProps<TChanceNode>) => {
           type="target"
           position={Position.Left}
           connectionCount={1}
+          onConnect={() => alert("connect")}
         />
         <Handle type="source" position={Position.Right} />
-        <NodeToolbar isVisible position={Position.Bottom} className="nodrag">
-          <ChanceProbabilityInput nodeID={id} probability={data.probability} />
-        </NodeToolbar>
       </div>
     </>
   );

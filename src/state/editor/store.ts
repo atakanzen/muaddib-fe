@@ -9,8 +9,7 @@ import {
   Node,
   NodeChange,
 } from "@xyflow/react";
-import { TChanceNode } from "../../nodes/chance-node";
-import { isChanceNode, isTextNode } from "../../utils/type-guards";
+import { isTextNode, isValueEdge } from "../../utils/type-guards";
 import { RootState } from "../store";
 
 interface EditorState {
@@ -24,7 +23,7 @@ interface EditorState {
 
 const initialState: EditorState = {
   nodes: [
-    { id: "1", position: { x: 0, y: 0 }, type: "decisionNode", data: {} },
+    { id: "1", position: { x: -300, y: 0 }, type: "decisionNode", data: {} },
     {
       id: "2",
       position: { x: 100, y: 75 },
@@ -43,17 +42,62 @@ const initialState: EditorState = {
       type: "chanceNode",
       data: { probability: 33.33 },
     },
-    { id: "5", position: { x: 300, y: 85 }, type: "endpointNode", data: {} },
-    { id: "6", position: { x: 300, y: 15 }, type: "endpointNode", data: {} },
-    { id: "7", position: { x: 300, y: -65 }, type: "endpointNode", data: {} },
+    { id: "5", position: { x: 500, y: 85 }, type: "endpointNode", data: {} },
+    { id: "6", position: { x: 500, y: 15 }, type: "endpointNode", data: {} },
+    { id: "7", position: { x: 500, y: -65 }, type: "endpointNode", data: {} },
   ],
   edges: [
-    { id: "1-2", source: "1", target: "2", sourceHandle: "1", animated: true },
-    { id: "1-3", source: "1", target: "3", sourceHandle: "1", animated: true },
-    { id: "1-4", source: "1", target: "4", sourceHandle: "1", animated: true },
-    { id: "4-7", source: "4", target: "7", animated: true },
-    { id: "3-6", source: "3", target: "6", animated: true },
-    { id: "2-5", source: "2", target: "5", animated: true },
+    {
+      id: "1-2",
+      source: "1",
+      target: "2",
+      sourceHandle: "1",
+      animated: true,
+      type: "valueEdge",
+      data: { value: 0 },
+    },
+    {
+      id: "1-3",
+      source: "1",
+      target: "3",
+      sourceHandle: "1",
+      animated: true,
+      type: "valueEdge",
+      data: { value: -10_000, valueType: "cost" },
+    },
+    {
+      id: "1-4",
+      source: "1",
+      target: "4",
+      sourceHandle: "1",
+      animated: true,
+      type: "valueEdge",
+      data: { value: -100_000, valueType: "cost" },
+    },
+    {
+      id: "4-7",
+      source: "4",
+      target: "7",
+      animated: true,
+      type: "valueEdge",
+      data: { value: 100000 },
+    },
+    {
+      id: "3-6",
+      source: "3",
+      target: "6",
+      animated: true,
+      type: "valueEdge",
+      data: { value: 100000, type: "cost" },
+    },
+    {
+      id: "2-5",
+      source: "2",
+      target: "5",
+      animated: true,
+      type: "valueEdge",
+      data: { value: 100000, type: "profit" },
+    },
   ],
   paneContextMenu: {
     visible: false,
@@ -72,7 +116,26 @@ export const editorSlice = createSlice({
       state.edges = applyEdgeChanges(action.payload, state.edges);
     },
     onConnect: (state, action: PayloadAction<Connection>) => {
-      state.edges = addEdge(action.payload, state.edges);
+      const { source } = action.payload;
+      const sourceNode = state.nodes.find((n) => n.id === source);
+
+      if (!sourceNode) {
+        return;
+      }
+
+      if (sourceNode.type === "decisionNode") {
+        state.edges = addEdge(
+          {
+            type: "valueEdge",
+            animated: true,
+            data: { value: 0, type: "profit" },
+            ...action.payload,
+          },
+          state.edges
+        );
+      } else {
+        state.edges = addEdge(action.payload, state.edges);
+      }
     },
     addNode: (state, action: PayloadAction<Node>) => {
       state.nodes.push(action.payload);
@@ -89,61 +152,61 @@ export const editorSlice = createSlice({
     hidePaneContextMenu: (state) => {
       state.paneContextMenu.visible = false;
     },
-    changeProbabilityForChanceNode: (
-      state,
-      action: PayloadAction<{
-        nodeID: string;
-        probability: number;
-        parentNodeID: string;
-      }>
-    ) => {
-      const { nodeID, probability, parentNodeID } = action.payload;
-      const chanceNode = state.nodes
-        .filter(isChanceNode)
-        .find((cn) => cn.id === nodeID);
+    // changeProbabilityForChanceNode: (
+    //   state,
+    //   action: PayloadAction<{
+    //     nodeID: string;
+    //     probability: number;
+    //     parentNodeID: string;
+    //   }>
+    // ) => {
+    //   const { nodeID, probability, parentNodeID } = action.payload;
+    //   const chanceNode = state.nodes
+    //     .filter(isChanceNode)
+    //     .find((cn) => cn.id === nodeID);
 
-      if (!chanceNode) {
-        return;
-      }
+    //   if (!chanceNode) {
+    //     return;
+    //   }
 
-      chanceNode.data.probability = probability;
-      chanceNode.data.isSetByUser = true;
+    //   chanceNode.data.probability = probability;
+    //   chanceNode.data.isSetByUser = true;
 
-      const otherChanceNodeIDs = state.edges
-        .filter((e) => e.source === parentNodeID && e.target !== nodeID)
-        .map((cn) => cn.target);
+    //   const otherChanceNodeIDs = state.edges
+    //     .filter((e) => e.source === parentNodeID && e.target !== nodeID)
+    //     .map((cn) => cn.target);
 
-      let remainingProbability = 100 - probability;
-      const otherNodes: TChanceNode[] = [];
+    //   let remainingProbability = 100 - probability;
+    //   const otherNodes: TChanceNode[] = [];
 
-      // Build array of nodes NOT set by user and calculate remaining possibility
-      otherChanceNodeIDs.forEach((otherNodeID) => {
-        const otherNode = state.nodes.find((n) => n.id === otherNodeID);
+    //   // Build array of nodes NOT set by user and calculate remaining possibility
+    //   otherChanceNodeIDs.forEach((otherNodeID) => {
+    //     const otherNode = state.nodes.find((n) => n.id === otherNodeID);
 
-        if (!otherNode || !isChanceNode(otherNode)) {
-          return;
-        }
+    //     if (!otherNode || !isChanceNode(otherNode)) {
+    //       return;
+    //     }
 
-        if (otherNode.data.isSetByUser) {
-          remainingProbability -= otherNode.data.probability;
-        } else {
-          otherNodes.push(otherNode);
-        }
-      });
+    //     if (otherNode.data.isSetByUser) {
+    //       remainingProbability -= otherNode.data.probability;
+    //     } else {
+    //       otherNodes.push(otherNode);
+    //     }
+    //   });
 
-      if (remainingProbability < 0) {
-        console.log("Probabilities do not sum up to 100%"); // TODO: Handle this
-      }
+    //   if (remainingProbability < 0) {
+    //     console.log("Probabilities do not sum up to 100%"); // TODO: Handle this
+    //   }
 
-      const dividedProbability =
-        otherNodes.length > 0
-          ? Math.max(remainingProbability / otherNodes.length, 0)
-          : 0;
+    //   const dividedProbability =
+    //     otherNodes.length > 0
+    //       ? Math.max(remainingProbability / otherNodes.length, 0)
+    //       : 0;
 
-      otherNodes.forEach((otherNode) => {
-        otherNode.data.probability = dividedProbability;
-      });
-    },
+    //   otherNodes.forEach((otherNode) => {
+    //     otherNode.data.probability = dividedProbability;
+    //   });
+    // },
     changeInputForTextNode: (
       state,
       action: PayloadAction<{ id: string; input: string }>
@@ -156,6 +219,24 @@ export const editorSlice = createSlice({
       }
       textNode.data.text = input;
     },
+    changeInputForValueEdge: (
+      state,
+      action: PayloadAction<{ id: string; value: number }>
+    ) => {
+      const { id, value } = action.payload;
+
+      const valueEdge = state.edges
+        .filter(isValueEdge)
+        .find((e) => e.id === id);
+      if (!valueEdge) {
+        console.error("value edge not found");
+        return;
+      }
+
+      valueEdge.data.value = value;
+      valueEdge.data.valueType =
+        value > 0 ? "profit" : value < 0 ? "cost" : undefined;
+    },
   },
 });
 
@@ -166,7 +247,8 @@ export const {
   addNode,
   showPaneContextMenu,
   hidePaneContextMenu,
-  changeProbabilityForChanceNode,
+  // changeProbabilityForChanceNode,
+  changeInputForValueEdge,
   changeInputForTextNode,
 } = editorSlice.actions;
 

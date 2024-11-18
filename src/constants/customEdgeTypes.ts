@@ -1,8 +1,8 @@
 import { EdgeTypes } from "@xyflow/react";
-import BezierEdge from "../edges/bezier-edge";
+import ValueEdge from "../edges/value-edge";
 
 const customEdgeTypes: EdgeTypes = {
-  bezierEdge: BezierEdge,
+  valueEdge: ValueEdge,
 };
 
 export { customEdgeTypes };

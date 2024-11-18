@@ -27,7 +27,8 @@ const TextNode = ({ id, data: { text } }: NodeProps<TTextNode>) => {
       name="text"
       value={text}
       onChange={handleOnChangeText}
-      className="bg-transparent border bg-gray-100 border-gray-400  p-1 text-xss"
+      autoFocus
+      className="bg-gray-100 text-center border rounded border-gray-400 p-1 text-xss active:cursor-move"
     />
   );
 };
