@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   addEdge,
   applyEdgeChanges,
@@ -9,7 +9,8 @@ import {
   Node,
   NodeChange,
 } from "@xyflow/react";
-import { isTextNode, isValueEdge } from "../../utils/type-guards";
+import { TChanceEdge } from "../../edges/chance-edge";
+import { isChanceEdge, isTextNode, isValueEdge } from "../../utils/type-guards";
 import { RootState } from "../store";
 
 interface EditorState {
@@ -79,24 +80,24 @@ const initialState: EditorState = {
       source: "4",
       target: "7",
       animated: true,
-      type: "valueEdge",
-      data: { value: 100000 },
+      type: "chanceEdge",
+      data: { probability: 0, isSetByUser: false },
     },
     {
       id: "3-6",
       source: "3",
       target: "6",
       animated: true,
-      type: "valueEdge",
-      data: { value: 100000, type: "cost" },
+      type: "chanceEdge",
+      data: { probability: 0, isSetByUser: false },
     },
     {
       id: "2-5",
       source: "2",
       target: "5",
       animated: true,
-      type: "valueEdge",
-      data: { value: 100000, type: "profit" },
+      type: "chanceEdge",
+      data: { probability: 0, isSetByUser: false },
     },
   ],
   paneContextMenu: {
@@ -115,11 +116,27 @@ export const editorSlice = createSlice({
     onEdgesChange: (state, action: PayloadAction<EdgeChange[]>) => {
       state.edges = applyEdgeChanges(action.payload, state.edges);
     },
+    onEdgesDelete: (state, action: PayloadAction<Edge[]>) => {
+      const edgesDeleted = action.payload;
+
+      edgesDeleted.forEach((e) => {
+        if (isChanceEdge(e)) {
+          const targetNode = state.nodes.find((n) => n.id === e.target);
+          if (!targetNode) {
+            console.error("no target node found for deleted chance edge");
+            return;
+          }
+
+          state.nodes = state.nodes.filter((n) => n.id !== targetNode.id);
+        }
+      });
+    },
     onConnect: (state, action: PayloadAction<Connection>) => {
       const { source } = action.payload;
       const sourceNode = state.nodes.find((n) => n.id === source);
 
       if (!sourceNode) {
+        console.error("no source node find");
         return;
       }
 
@@ -128,13 +145,35 @@ export const editorSlice = createSlice({
           {
             type: "valueEdge",
             animated: true,
-            data: { value: 0, type: "profit" },
+            data: { value: 0 },
             ...action.payload,
           },
           state.edges
         );
-      } else {
-        state.edges = addEdge(action.payload, state.edges);
+      } else if (sourceNode.type === "chanceNode") {
+        const siblingChanceEdges = state.edges
+          .filter(isChanceEdge)
+          .filter((e) => e.source === source);
+
+        const totalSiblingProbability = siblingChanceEdges.reduce(
+          (sum, edge) => sum + edge.data.probability,
+          0
+        );
+
+        const remainingProbability = 100 - totalSiblingProbability;
+
+        const newProbability =
+          remainingProbability > 0 ? remainingProbability : 0;
+
+        state.edges = addEdge(
+          {
+            type: "chanceEdge",
+            animated: true,
+            data: { probability: newProbability, isSetByUser: false },
+            ...action.payload,
+          },
+          state.edges
+        );
       }
     },
     addNode: (state, action: PayloadAction<Node>) => {
@@ -152,61 +191,63 @@ export const editorSlice = createSlice({
     hidePaneContextMenu: (state) => {
       state.paneContextMenu.visible = false;
     },
-    // changeProbabilityForChanceNode: (
-    //   state,
-    //   action: PayloadAction<{
-    //     nodeID: string;
-    //     probability: number;
-    //     parentNodeID: string;
-    //   }>
-    // ) => {
-    //   const { nodeID, probability, parentNodeID } = action.payload;
-    //   const chanceNode = state.nodes
-    //     .filter(isChanceNode)
-    //     .find((cn) => cn.id === nodeID);
+    changeProbabilityForChanceEdge: (
+      state,
+      action: PayloadAction<{
+        edgeID: string;
+        probability: number;
+        sourceNodeID: string;
+      }>
+    ) => {
+      // TODO: This is still not working when there are multiple sibling chance edges. Sometimes the probabilities are not being set, sometimes the sum up is incorrect like having 99% and 43% at the same time...
+      const { edgeID, probability, sourceNodeID } = action.payload;
 
-    //   if (!chanceNode) {
-    //     return;
-    //   }
+      const chanceEdge = state.edges
+        .filter(isChanceEdge)
+        .find((cn) => cn.id === edgeID);
 
-    //   chanceNode.data.probability = probability;
-    //   chanceNode.data.isSetByUser = true;
+      if (!chanceEdge) {
+        console.error("no chance edge found");
+        return;
+      }
 
-    //   const otherChanceNodeIDs = state.edges
-    //     .filter((e) => e.source === parentNodeID && e.target !== nodeID)
-    //     .map((cn) => cn.target);
+      chanceEdge.data.probability = Math.min(probability, 100);
+      chanceEdge.data.isSetByUser = true;
 
-    //   let remainingProbability = 100 - probability;
-    //   const otherNodes: TChanceNode[] = [];
+      const otherChanceEdges = state.edges.filter(
+        (e) => e.source === sourceNodeID && e.id !== edgeID
+      );
 
-    //   // Build array of nodes NOT set by user and calculate remaining possibility
-    //   otherChanceNodeIDs.forEach((otherNodeID) => {
-    //     const otherNode = state.nodes.find((n) => n.id === otherNodeID);
+      let remainingProbability = 100 - probability;
+      const otherEdges: TChanceEdge[] = [];
 
-    //     if (!otherNode || !isChanceNode(otherNode)) {
-    //       return;
-    //     }
+      // Build array of nodes NOT set by user and calculate remaining possibility
+      otherChanceEdges.forEach((otherEdge) => {
+        if (!isChanceEdge(otherEdge)) {
+          console.error("other edge is not a chance edge");
+          return;
+        }
 
-    //     if (otherNode.data.isSetByUser) {
-    //       remainingProbability -= otherNode.data.probability;
-    //     } else {
-    //       otherNodes.push(otherNode);
-    //     }
-    //   });
+        if (otherEdge.data.isSetByUser) {
+          remainingProbability -= otherEdge.data.probability;
+        } else {
+          otherEdges.push(otherEdge);
+        }
+      });
 
-    //   if (remainingProbability < 0) {
-    //     console.log("Probabilities do not sum up to 100%"); // TODO: Handle this
-    //   }
+      if (remainingProbability < 0) {
+        console.log("Probabilities do not sum up to 100%"); // TODO: Handle this
+      }
 
-    //   const dividedProbability =
-    //     otherNodes.length > 0
-    //       ? Math.max(remainingProbability / otherNodes.length, 0)
-    //       : 0;
+      const dividedProbability =
+        otherEdges.length > 0
+          ? Math.max(remainingProbability / otherEdges.length, 0)
+          : 0;
 
-    //   otherNodes.forEach((otherNode) => {
-    //     otherNode.data.probability = dividedProbability;
-    //   });
-    // },
+      otherEdges.forEach((otherNode) => {
+        otherNode.data.probability = dividedProbability;
+      });
+    },
     changeInputForTextNode: (
       state,
       action: PayloadAction<{ id: string; input: string }>
@@ -244,16 +285,24 @@ export const {
   onConnect,
   onEdgesChange,
   onNodesChange,
+  onEdgesDelete,
   addNode,
   showPaneContextMenu,
   hidePaneContextMenu,
-  // changeProbabilityForChanceNode,
+  changeProbabilityForChanceEdge,
   changeInputForValueEdge,
   changeInputForTextNode,
 } = editorSlice.actions;
 
 export const selectNodes = (state: RootState) => state.editor.nodes;
 export const selectEdges = (state: RootState) => state.editor.edges;
+export const selectEdgeByID = createSelector(
+  [
+    (state: RootState) => state.editor.edges,
+    (_state: RootState, edgeID: string) => edgeID,
+  ],
+  (edges, edgeID) => edges.find((e) => e.id === edgeID) as TChanceEdge
+);
 export const selectPaneContextVisible = (state: RootState) =>
   state.editor.paneContextMenu.visible;
 export const selectPaneContextPosition = (state: RootState) =>

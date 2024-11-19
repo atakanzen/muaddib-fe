@@ -22,6 +22,7 @@ import {
   hidePaneContextMenu,
   onConnect,
   onEdgesChange,
+  onEdgesDelete,
   onNodesChange,
   selectEdges,
   selectNodes,
@@ -77,6 +78,7 @@ function App() {
         onConnect={(conn) => dispatch(onConnect(conn))}
         onNodesChange={(ch) => dispatch(onNodesChange(ch))}
         onEdgesChange={(ch) => dispatch(onEdgesChange(ch))}
+        onEdgesDelete={(edges) => dispatch(onEdgesDelete(edges))}
         onPaneContextMenu={handleOnContextMenu}
         onPaneClick={onPaneClick}
         fitView

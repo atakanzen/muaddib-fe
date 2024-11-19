@@ -1,38 +1,43 @@
 import { ChangeEvent, useCallback } from "react";
-// import { changeProbabilityForChanceNode } from "../state/editor/store";
+import { TChanceEdge } from "../edges/chance-edge";
+import { useSourceNodeID } from "../hooks/useParentNode";
+import {
+  changeProbabilityForChanceEdge,
+  selectEdgeByID,
+} from "../state/editor/store";
+import { useAppDispatch, useAppSelector } from "../state/hooks";
 
 interface ChanceProbabilityProps {
-  probability: number;
-  nodeID: string;
+  edgeID: string;
 }
 
-const ChanceProbabilityInput = ({
-  probability,
-}: // nodeID,
-ChanceProbabilityProps) => {
-  // const dispatch = useAppDispatch();
+const ChanceProbabilityInput = ({ edgeID }: ChanceProbabilityProps) => {
+  const dispatch = useAppDispatch();
 
-  // const parentNodeID = useParentNodeID(nodeID) ?? "";
+  const sourceNodeID = useSourceNodeID(edgeID) ?? "";
+  const edge: TChanceEdge | undefined = useAppSelector((state) =>
+    selectEdgeByID(state, edgeID)
+  );
 
   const handleOnChangeProbabilityInput = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      console.log(e.target.value);
-      // dispatch(
-      //   changeProbabilityForChanceNode({
-      //     nodeID,
-      //     probability: Number(e.target.value),
-      //     parentNodeID: parentNodeID,
-      //   })
-      // );
+      dispatch(
+        changeProbabilityForChanceEdge({
+          edgeID,
+          probability: Number(e.target.value),
+          sourceNodeID,
+        })
+      );
     },
-    []
+    [dispatch, edgeID, sourceNodeID]
   );
+  const probability = edge?.data.probability ?? 0;
 
   return (
-    <div className="absolute text-xss w-12 pointer-events-auto">
+    <div className="absolute text-xss w-16 pointer-events-auto">
       <input
         type="number"
-        className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none w-full  py-2 px-3 bg-white border border-gray-300 rounded "
+        className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none w-full  p-1 bg-white border border-gray-300 rounded"
         value={probability}
         max={100}
         onChange={handleOnChangeProbabilityInput}
