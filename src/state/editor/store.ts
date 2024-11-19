@@ -12,6 +12,7 @@ import {
 import { TChanceEdge } from "../../edges/chance-edge";
 import { isChanceEdge, isTextNode, isValueEdge } from "../../utils/type-guards";
 import { RootState } from "../store";
+import { toFixedFloat } from "../../utils/toFixedFloat";
 
 interface EditorState {
   nodes: Node[];
@@ -27,25 +28,10 @@ const initialState: EditorState = {
     { id: "1", position: { x: -300, y: 0 }, type: "decisionNode", data: {} },
     {
       id: "2",
-      position: { x: 100, y: 75 },
+      position: { x: 0, y: 0 },
       type: "chanceNode",
-      data: { probability: 33.33 },
-    },
-    {
-      id: "3",
-      position: { x: 100, y: 0 },
-      type: "chanceNode",
-      data: { probability: 33.33 },
-    },
-    {
-      id: "4",
-      position: { x: 100, y: -75 },
-      type: "chanceNode",
-      data: { probability: 33.33 },
-    },
-    { id: "5", position: { x: 500, y: 85 }, type: "endpointNode", data: {} },
-    { id: "6", position: { x: 500, y: 15 }, type: "endpointNode", data: {} },
-    { id: "7", position: { x: 500, y: -65 }, type: "endpointNode", data: {} },
+      data: { },
+    }
   ],
   edges: [
     {
@@ -56,24 +42,6 @@ const initialState: EditorState = {
       animated: true,
       type: "valueEdge",
       data: { value: 0 },
-    },
-    {
-      id: "1-3",
-      source: "1",
-      target: "3",
-      sourceHandle: "1",
-      animated: true,
-      type: "valueEdge",
-      data: { value: -10_000, valueType: "cost" },
-    },
-    {
-      id: "1-4",
-      source: "1",
-      target: "4",
-      sourceHandle: "1",
-      animated: true,
-      type: "valueEdge",
-      data: { value: -100_000, valueType: "cost" },
     },
     {
       id: "4-7",
@@ -90,15 +58,7 @@ const initialState: EditorState = {
       animated: true,
       type: "chanceEdge",
       data: { probability: 0, isSetByUser: false },
-    },
-    {
-      id: "2-5",
-      source: "2",
-      target: "5",
-      animated: true,
-      type: "chanceEdge",
-      data: { probability: 0, isSetByUser: false },
-    },
+    }
   ],
   paneContextMenu: {
     visible: false,
@@ -214,37 +174,33 @@ export const editorSlice = createSlice({
       chanceEdge.data.probability = Math.min(probability, 100);
       chanceEdge.data.isSetByUser = true;
 
+      let remainingProbability = 100 - chanceEdge.data.probability;
+
       const otherChanceEdges = state.edges.filter(
-        (e) => e.source === sourceNodeID && e.id !== edgeID
-      );
+        (e) => {
+            if (!isChanceEdge(e) || e.source !== sourceNodeID || e.id === edgeID) {
+                return false;
+            }
 
-      let remainingProbability = 100 - probability;
-      const otherEdges: TChanceEdge[] = [];
-
-      // Build array of nodes NOT set by user and calculate remaining possibility
-      otherChanceEdges.forEach((otherEdge) => {
-        if (!isChanceEdge(otherEdge)) {
-          console.error("other edge is not a chance edge");
-          return;
+            if (e.data.isSetByUser) {
+                remainingProbability -= e.data.probability;
+                return false;
+            }
+            
+            return  true;
         }
-
-        if (otherEdge.data.isSetByUser) {
-          remainingProbability -= otherEdge.data.probability;
-        } else {
-          otherEdges.push(otherEdge);
-        }
-      });
+      ) as TChanceEdge[];
 
       if (remainingProbability < 0) {
         console.log("Probabilities do not sum up to 100%"); // TODO: Handle this
       }
 
       const dividedProbability =
-        otherEdges.length > 0
-          ? Math.max(remainingProbability / otherEdges.length, 0)
+        otherChanceEdges.length > 0
+          ? toFixedFloat(Math.max(remainingProbability / otherChanceEdges.length, 0), 2)
           : 0;
 
-      otherEdges.forEach((otherNode) => {
+      otherChanceEdges.forEach((otherNode) => {
         otherNode.data.probability = dividedProbability;
       });
     },
