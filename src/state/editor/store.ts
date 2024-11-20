@@ -10,11 +10,12 @@ import {
   NodeChange,
 } from "@xyflow/react";
 import { TChanceEdge } from "../../edges/chance-edge";
-import { isChanceEdge, isTextNode, isValueEdge } from "../../utils/type-guards";
-import { RootState } from "../store";
 import { toFixedFloat } from "../../utils/toFixedFloat";
+import { isChanceEdge, isTextNode, isValueEdge } from "../../utils/type-guards";
+import { sensorDemo } from "../demos";
+import { RootState } from "../store";
 
-interface EditorState {
+export interface EditorState {
   nodes: Node[];
   edges: Edge[];
   paneContextMenu: {
@@ -23,48 +24,7 @@ interface EditorState {
   };
 }
 
-const initialState: EditorState = {
-  nodes: [
-    { id: "1", position: { x: -300, y: 0 }, type: "decisionNode", data: {} },
-    {
-      id: "2",
-      position: { x: 0, y: 0 },
-      type: "chanceNode",
-      data: { },
-    }
-  ],
-  edges: [
-    {
-      id: "1-2",
-      source: "1",
-      target: "2",
-      sourceHandle: "1",
-      animated: true,
-      type: "valueEdge",
-      data: { value: 0 },
-    },
-    {
-      id: "4-7",
-      source: "4",
-      target: "7",
-      animated: true,
-      type: "chanceEdge",
-      data: { probability: 0, isSetByUser: false },
-    },
-    {
-      id: "3-6",
-      source: "3",
-      target: "6",
-      animated: true,
-      type: "chanceEdge",
-      data: { probability: 0, isSetByUser: false },
-    }
-  ],
-  paneContextMenu: {
-    visible: false,
-    position: { x: 0, y: 0 },
-  },
-};
+const initialState: EditorState = sensorDemo;
 
 export const editorSlice = createSlice({
   name: "editor",
@@ -174,22 +134,15 @@ export const editorSlice = createSlice({
       chanceEdge.data.probability = Math.min(probability, 100);
       chanceEdge.data.isSetByUser = true;
 
-      let remainingProbability = 100 - chanceEdge.data.probability;
+      const remainingProbability = 100 - chanceEdge.data.probability;
 
-      const otherChanceEdges = state.edges.filter(
-        (e) => {
-            if (!isChanceEdge(e) || e.source !== sourceNodeID || e.id === edgeID) {
-                return false;
-            }
-
-            if (e.data.isSetByUser) {
-                remainingProbability -= e.data.probability;
-                return false;
-            }
-            
-            return  true;
+      const otherChanceEdges = state.edges.filter((e) => {
+        if (!isChanceEdge(e) || e.source !== sourceNodeID || e.id === edgeID) {
+          return false;
         }
-      ) as TChanceEdge[];
+
+        return true;
+      }) as TChanceEdge[];
 
       if (remainingProbability < 0) {
         console.log("Probabilities do not sum up to 100%"); // TODO: Handle this
@@ -197,7 +150,10 @@ export const editorSlice = createSlice({
 
       const dividedProbability =
         otherChanceEdges.length > 0
-          ? toFixedFloat(Math.max(remainingProbability / otherChanceEdges.length, 0), 2)
+          ? toFixedFloat(
+              Math.max(remainingProbability / otherChanceEdges.length, 0),
+              2
+            )
           : 0;
 
       otherChanceEdges.forEach((otherNode) => {
