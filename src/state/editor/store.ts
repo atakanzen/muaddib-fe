@@ -81,7 +81,7 @@ export const editorSlice = createSlice({
           {
             type: "decisionEdge",
             animated: true,
-            data: { value: 0 },
+            data: { payoff: 0 },
             ...action.payload,
           },
           state.edges
