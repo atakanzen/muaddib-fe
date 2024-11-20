@@ -1,10 +1,8 @@
 import { Handle, type Node, NodeProps, Position } from "@xyflow/react";
 import classNames from "classnames";
-import { TChanceNode } from "./chance-node";
 
 type DecisionNodeData = {
   ev: number;
-  chanceNodes: TChanceNode[];
 };
 
 export type TDecisionNode = Node<DecisionNodeData, "decisionNode">;
