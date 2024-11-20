@@ -33,7 +33,7 @@ const sensorDemo: EditorState = {
       id: "4",
       type: "endpointNode",
       position: {
-        x: 200,
+        x: 400,
         y: -80,
       },
       data: {},
@@ -42,7 +42,7 @@ const sensorDemo: EditorState = {
       id: "5",
       type: "endpointNode",
       position: {
-        x: 200,
+        x: 400,
         y: -20,
       },
       data: {},
@@ -51,7 +51,7 @@ const sensorDemo: EditorState = {
       id: "6",
       type: "endpointNode",
       position: {
-        x: 200,
+        x: 400,
         y: 20,
       },
       data: {},
@@ -60,7 +60,7 @@ const sensorDemo: EditorState = {
       id: "7",
       type: "endpointNode",
       position: {
-        x: 200,
+        x: 400,
         y: 80,
       },
       data: {},
@@ -69,7 +69,7 @@ const sensorDemo: EditorState = {
       id: "8",
       type: "endpointNode",
       position: {
-        x: 10,
+        x: 0,
         y: 150,
       },
       data: {},
@@ -81,10 +81,10 @@ const sensorDemo: EditorState = {
       source: "1",
       target: "2",
       animated: true,
-      type: "valueEdge",
+      type: "decisionEdge",
       data: {
-        value: -100_000,
-        valueType: "cost",
+        payoff: -100_000,
+        payoffType: "cost",
       },
     },
     {
@@ -92,10 +92,10 @@ const sensorDemo: EditorState = {
       source: "1",
       target: "3",
       animated: true,
-      type: "valueEdge",
+      type: "decisionEdge",
       data: {
-        value: -10_000,
-        valueType: "cost",
+        payoff: -10_000,
+        payoffType: "cost",
       },
     },
     {
@@ -103,6 +103,10 @@ const sensorDemo: EditorState = {
       source: "1",
       target: "8",
       animated: true,
+      type: "decisionEdge",
+      data: {
+        payoff: 0,
+      },
     },
     {
       id: "2-4",
@@ -113,6 +117,8 @@ const sensorDemo: EditorState = {
       data: {
         probability: 50,
         isSetByUser: false,
+        payoff: 1_000_000,
+        payoffType: "profit",
       },
     },
     {
@@ -124,6 +130,7 @@ const sensorDemo: EditorState = {
       data: {
         probability: 50,
         isSetByUser: false,
+        payoff: 0,
       },
     },
     {
@@ -135,6 +142,8 @@ const sensorDemo: EditorState = {
       data: {
         probability: 80,
         isSetByUser: false,
+        payoff: 80_000,
+        payoffType: "profit",
       },
     },
     {
@@ -146,6 +155,7 @@ const sensorDemo: EditorState = {
       data: {
         probability: 20,
         isSetByUser: false,
+        payoff: 0,
       },
     },
   ],

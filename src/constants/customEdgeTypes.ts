@@ -1,9 +1,9 @@
 import { EdgeTypes } from "@xyflow/react";
 import ChanceEdge from "../edges/chance-edge";
-import ValueEdge from "../edges/value-edge";
+import DecisionEdge from "../edges/decision-edge";
 
 const customEdgeTypes: EdgeTypes = {
-  valueEdge: ValueEdge,
+  decisionEdge: DecisionEdge,
   chanceEdge: ChanceEdge,
 };
 

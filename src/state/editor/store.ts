@@ -41,6 +41,22 @@ export const editorSlice = createSlice({
 
       edgesDeleted.forEach((e) => {
         if (isChanceEdge(e)) {
+          const siblingChanceEdges = state.edges.filter(
+            (oe) => isChanceEdge(oe) && oe.id !== e.id && oe.source === e.source
+          ) as TChanceEdge[];
+
+          // Divide equally leftover sibling chance edges probability
+          if (siblingChanceEdges.length > 0) {
+            const dividedProbability = toFixedFloat(
+              Math.max(100 / siblingChanceEdges.length, 0),
+              2
+            );
+
+            siblingChanceEdges.forEach((se) => {
+              se.data.probability = dividedProbability;
+            });
+          }
+
           const targetNode = state.nodes.find((n) => n.id === e.target);
           if (!targetNode) {
             console.error("no target node found for deleted chance edge");
@@ -63,7 +79,7 @@ export const editorSlice = createSlice({
       if (sourceNode.type === "decisionNode") {
         state.edges = addEdge(
           {
-            type: "valueEdge",
+            type: "decisionEdge",
             animated: true,
             data: { value: 0 },
             ...action.payload,
@@ -89,7 +105,11 @@ export const editorSlice = createSlice({
           {
             type: "chanceEdge",
             animated: true,
-            data: { probability: newProbability, isSetByUser: false },
+            data: {
+              probability: newProbability,
+              isSetByUser: false,
+              payoff: 0,
+            },
             ...action.payload,
           },
           state.edges
@@ -119,7 +139,6 @@ export const editorSlice = createSlice({
         sourceNodeID: string;
       }>
     ) => {
-      // TODO: This is still not working when there are multiple sibling chance edges. Sometimes the probabilities are not being set, sometimes the sum up is incorrect like having 99% and 43% at the same time...
       const { edgeID, probability, sourceNodeID } = action.payload;
 
       const chanceEdge = state.edges
@@ -172,22 +191,40 @@ export const editorSlice = createSlice({
       }
       textNode.data.text = input;
     },
-    changeInputForValueEdge: (
+    changePayoffInputForDecisionEdge: (
       state,
       action: PayloadAction<{ id: string; value: number }>
     ) => {
       const { id, value } = action.payload;
 
-      const valueEdge = state.edges
+      const decisionEdge = state.edges
         .filter(isValueEdge)
         .find((e) => e.id === id);
-      if (!valueEdge) {
+      if (!decisionEdge) {
         console.error("value edge not found");
         return;
       }
 
-      valueEdge.data.value = value;
-      valueEdge.data.valueType =
+      decisionEdge.data.payoff = value;
+      decisionEdge.data.payoffType =
+        value > 0 ? "profit" : value < 0 ? "cost" : undefined;
+    },
+    changePayoffInputForChanceEdge: (
+      state,
+      action: PayloadAction<{ id: string; value: number }>
+    ) => {
+      const { id, value } = action.payload;
+
+      const chanceEdge = state.edges
+        .filter(isChanceEdge)
+        .find((e) => e.id === id);
+
+      if (!chanceEdge) {
+        console.error("chance edge not found");
+        return;
+      }
+      chanceEdge.data.payoff = value;
+      chanceEdge.data.payoffType =
         value > 0 ? "profit" : value < 0 ? "cost" : undefined;
     },
   },
@@ -202,7 +239,8 @@ export const {
   showPaneContextMenu,
   hidePaneContextMenu,
   changeProbabilityForChanceEdge,
-  changeInputForValueEdge,
+  changePayoffInputForDecisionEdge,
+  changePayoffInputForChanceEdge,
   changeInputForTextNode,
 } = editorSlice.actions;
 

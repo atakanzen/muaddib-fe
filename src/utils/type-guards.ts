@@ -1,6 +1,6 @@
 import { Edge, Node } from "@xyflow/react";
 import { TChanceEdge } from "../edges/chance-edge";
-import { TValueEdge } from "../edges/value-edge";
+import { TDecisionEdge } from "../edges/decision-edge";
 import { TDecisionNode } from "../nodes/decision-node";
 import { TTextNode } from "../nodes/text-node";
 
@@ -12,8 +12,8 @@ const isTextNode = (node: Node): node is TTextNode => {
   return node.type === "textNode";
 };
 
-const isValueEdge = (edge: Edge): edge is TValueEdge => {
-  return edge.type === "valueEdge";
+const isValueEdge = (edge: Edge): edge is TDecisionEdge => {
+  return edge.type === "decisionEdge";
 };
 
 const isChanceEdge = (edge: Edge): edge is TChanceEdge => {
