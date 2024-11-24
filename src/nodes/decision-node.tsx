@@ -13,8 +13,8 @@ export const DecisionNode = ({
   id,
 }: NodeProps<TDecisionNode>) => {
   return (
-    <div className="flex gap-2 items-center justify-center">
-      <span className="nodrag hover:cursor-default select-text border border-black px-1 py-1/2 bg-blue-200 rounded-sm font-semibold text-black text-xs w-22 truncate">
+    <div className="relative">
+      <span className="absolute right-full top-1/2 -translate-y-1/2 mr-2 nodrag hover:cursor-default select-text border border-slate-600 p-1 bg-slate-500 rounded font-semibold text-white text-xss w-22 truncate">
         EV: {data.ev ?? "N/A"}
       </span>
       <div

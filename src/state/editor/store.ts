@@ -1,4 +1,4 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   addEdge,
   applyEdgeChanges,
@@ -246,13 +246,10 @@ export const {
 
 export const selectNodes = (state: RootState) => state.editor.nodes;
 export const selectEdges = (state: RootState) => state.editor.edges;
-export const selectEdgeByID = createSelector(
-  [
-    (state: RootState) => state.editor.edges,
-    (_state: RootState, edgeID: string) => edgeID,
-  ],
-  (edges, edgeID) => edges.find((e) => e.id === edgeID) as TChanceEdge
-);
+export const selectEdgeByID = <T = Edge>(state: RootState, edgeID: string) =>
+  state.editor.edges.find((e) => e.id === edgeID) as T | undefined;
+export const selectNodeByID = <T = Node>(state: RootState, nodeID: string) =>
+  state.editor.nodes.find((n) => n.id === nodeID) as T | undefined;
 export const selectPaneContextVisible = (state: RootState) =>
   state.editor.paneContextMenu.visible;
 export const selectPaneContextPosition = (state: RootState) =>

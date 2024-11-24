@@ -17,7 +17,7 @@ const ChanceProbabilityInput = ({ edgeID }: ChanceProbabilityProps) => {
 
   const sourceNodeID = useSourceNodeID(edgeID) ?? "";
   const edge: TChanceEdge | undefined = useAppSelector((state) =>
-    selectEdgeByID(state, edgeID)
+    selectEdgeByID<TChanceEdge>(state, edgeID)
   );
 
   const handleOnChangeProbabilityInput = useCallback(
