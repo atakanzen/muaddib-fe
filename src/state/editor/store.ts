@@ -10,8 +10,19 @@ import {
   NodeChange,
 } from "@xyflow/react";
 import { TChanceEdge } from "../../edges/chance-edge";
+import { TDecisionEdge } from "../../edges/decision-edge";
+import { TEndpointNode } from "../../nodes/endpoint-node";
+import {
+  calculateTotalPayoff,
+  findConnectedEndpoints,
+} from "../../utils/ev-calculations";
 import { toFixedFloat } from "../../utils/toFixedFloat";
-import { isChanceEdge, isTextNode, isValueEdge } from "../../utils/type-guards";
+import {
+  isChanceEdge,
+  isDecisionEdge,
+  isEndpointNode,
+  isTextNode,
+} from "../../utils/type-guards";
 import { sensorDemo } from "../demos";
 import { RootState } from "../store";
 
@@ -197,17 +208,31 @@ export const editorSlice = createSlice({
     ) => {
       const { id, value } = action.payload;
 
-      const decisionEdge = state.edges
-        .filter(isValueEdge)
-        .find((e) => e.id === id);
+      const decisionEdge = state.edges.find(
+        (e) => e.id === id && isDecisionEdge(e)
+      ) as TDecisionEdge | undefined;
+
       if (!decisionEdge) {
-        console.error("value edge not found");
+        console.error("decision edge not found");
         return;
       }
 
       decisionEdge.data.payoff = value;
       decisionEdge.data.payoffType =
         value > 0 ? "profit" : value < 0 ? "cost" : undefined;
+
+      const connectedEndpoints = findConnectedEndpoints(
+        decisionEdge.target,
+        state.edges,
+        state.nodes
+      );
+
+      connectedEndpoints.forEach((endpointNode) => {
+        endpointNode.data.calculatedPayoff = calculateTotalPayoff(
+          endpointNode.id,
+          state.edges
+        );
+      });
     },
     changePayoffInputForChanceEdge: (
       state,
@@ -215,9 +240,9 @@ export const editorSlice = createSlice({
     ) => {
       const { id, value } = action.payload;
 
-      const chanceEdge = state.edges
-        .filter(isChanceEdge)
-        .find((e) => e.id === id);
+      const chanceEdge = state.edges.find(
+        (e) => e.id === id && isChanceEdge(e)
+      ) as TChanceEdge | undefined;
 
       if (!chanceEdge) {
         console.error("chance edge not found");
@@ -226,6 +251,16 @@ export const editorSlice = createSlice({
       chanceEdge.data.payoff = value;
       chanceEdge.data.payoffType =
         value > 0 ? "profit" : value < 0 ? "cost" : undefined;
+
+      const targetNode = state.nodes.find(
+        (n) => n.id === chanceEdge.target && isEndpointNode(n)
+      ) as TEndpointNode | undefined;
+      if (targetNode) {
+        targetNode.data.calculatedPayoff = calculateTotalPayoff(
+          targetNode.id,
+          state.edges
+        );
+      }
     },
   },
 });

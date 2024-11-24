@@ -36,7 +36,9 @@ const sensorDemo: EditorState = {
         x: 400,
         y: -80,
       },
-      data: {},
+      data: {
+        calculatedPayoff: 900_000,
+      },
     },
     {
       id: "5",
@@ -45,7 +47,9 @@ const sensorDemo: EditorState = {
         x: 400,
         y: -20,
       },
-      data: {},
+      data: {
+        calculatedPayoff: -100_000,
+      },
     },
     {
       id: "6",
@@ -54,7 +58,9 @@ const sensorDemo: EditorState = {
         x: 400,
         y: 20,
       },
-      data: {},
+      data: {
+        calculatedPayoff: 70_000,
+      },
     },
     {
       id: "7",
@@ -63,7 +69,9 @@ const sensorDemo: EditorState = {
         x: 400,
         y: 80,
       },
-      data: {},
+      data: {
+        calculatedPayoff: -10_000,
+      },
     },
     {
       id: "8",
@@ -72,7 +80,9 @@ const sensorDemo: EditorState = {
         x: 0,
         y: 150,
       },
-      data: {},
+      data: {
+        calculatedPayoff: 0,
+      },
     },
   ],
   edges: [

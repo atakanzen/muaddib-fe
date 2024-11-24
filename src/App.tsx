@@ -81,6 +81,7 @@ function App() {
         onEdgesDelete={(edges) => dispatch(onEdgesDelete(edges))}
         onPaneContextMenu={handleOnContextMenu}
         onPaneClick={onPaneClick}
+        proOptions={{ hideAttribution: true }}
         fitView
       >
         {paneContextMenuVisible && <ContextMenu />}
