@@ -11,6 +11,7 @@ const sensorDemo: EditorState = {
       },
       data: {
         isRoot: true,
+        ev: 400_000,
       },
     },
     {
@@ -20,7 +21,9 @@ const sensorDemo: EditorState = {
         x: 0,
         y: -50,
       },
-      data: {},
+      data: {
+        ev: 400_000,
+      },
     },
     {
       id: "3",
@@ -29,7 +32,9 @@ const sensorDemo: EditorState = {
         x: 0,
         y: 50,
       },
-      data: {},
+      data: {
+        ev: 310_000,
+      },
     },
     {
       id: "4",
