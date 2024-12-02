@@ -29,7 +29,7 @@ export const ChanceNode = ({
         <Handle type="source" position={Position.Right} />
       </div>
       <div className="absolute nodrag hover:cursor-default select-text w-16 border border-slate-600 text-center p-1 bg-slate-500 text-white mt-2 text-xss font-bold rounded left-1/2 top-full -translate-x-1/2">
-        EV: {ev ?? "N/A"}
+        ${ev !== undefined ? Intl.NumberFormat("en-US").format(ev) : "N/A"}
       </div>
     </div>
   );

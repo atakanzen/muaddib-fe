@@ -13,6 +13,7 @@ import { TChanceEdge } from "../../edges/chance-edge";
 import { TDecisionEdge } from "../../edges/decision-edge";
 import { TEndpointNode } from "../../nodes/endpoint-node";
 import {
+  calculateEVForChanceNode,
   calculateTotalPayoff,
   findConnectedEndpoints,
 } from "../../utils/ev-calculations";
@@ -152,9 +153,9 @@ export const editorSlice = createSlice({
     ) => {
       const { edgeID, probability, sourceNodeID } = action.payload;
 
-      const chanceEdge = state.edges
-        .filter(isChanceEdge)
-        .find((cn) => cn.id === edgeID);
+      const chanceEdge = state.edges.find(
+        (e) => e.id === edgeID && isChanceEdge(e)
+      ) as TChanceEdge | undefined;
 
       if (!chanceEdge) {
         console.error("no chance edge found");
@@ -189,6 +190,8 @@ export const editorSlice = createSlice({
       otherChanceEdges.forEach((otherNode) => {
         otherNode.data.probability = dividedProbability;
       });
+
+      calculateEVForChanceNode(sourceNodeID, state);
     },
     changeInputForTextNode: (
       state,
@@ -260,6 +263,11 @@ export const editorSlice = createSlice({
           targetNode.id,
           state.edges
         );
+      }
+
+      const sourceNode = state.nodes.find((n) => n.id === chanceEdge.source);
+      if (sourceNode) {
+        calculateEVForChanceNode(sourceNode.id, state);
       }
     },
   },

@@ -26,7 +26,7 @@ export const EndpointNode = ({
         />
       </div>
       <div className="absolute flex items-center justify-between nodrag hover:cursor-default select-text left-full top-1/2 -translate-y-1/2 ml-4 p-1 rounded bg-slate-500 border border-slate-600 text-white font-bold text-xss min-w-16 text-center">
-        {calculatedPayoff && <span>$</span>}
+        {calculatedPayoff !== undefined ? <span>$</span> : null}
         {calculatedPayoff !== undefined
           ? Intl.NumberFormat("en-US").format(calculatedPayoff)
           : "N/A"}

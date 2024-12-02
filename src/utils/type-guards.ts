@@ -1,9 +1,14 @@
 import { Edge, Node } from "@xyflow/react";
 import { TChanceEdge } from "../edges/chance-edge";
 import { TDecisionEdge } from "../edges/decision-edge";
+import { TChanceNode } from "../nodes/chance-node";
 import { TDecisionNode } from "../nodes/decision-node";
 import { TEndpointNode } from "../nodes/endpoint-node";
 import { TTextNode } from "../nodes/text-node";
+
+const isChanceNode = (node: Node): node is TChanceNode => {
+  return node.type === "chanceNode";
+};
 
 const isDecisionNode = (node: Node): node is TDecisionNode => {
   return node.type === "decisionNode";
@@ -27,6 +32,7 @@ const isChanceEdge = (edge: Edge): edge is TChanceEdge => {
 
 export {
   isChanceEdge,
+  isChanceNode,
   isDecisionEdge,
   isDecisionNode,
   isEndpointNode,
