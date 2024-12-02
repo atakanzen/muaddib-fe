@@ -9,25 +9,28 @@ import ChanceProbabilityInput from "../components/chance-probability-input";
 import { PayoffInput, PayoffType } from "../components/payoff-input";
 import { changePayoffInputForChanceEdge } from "../state/editor/store";
 
-type ChanceEdgeData = {
+type ChanceToEndpointEdgeData = {
   probability: number;
   isSetByUser: boolean;
   payoff: number;
   payoffType?: PayoffType;
 };
 
-export type TChanceEdge = Omit<Edge<ChanceEdgeData, "chanceEdge">, "data"> & {
-  data: ChanceEdgeData;
+export type TChanceToEndpointEdge = Omit<
+  Edge<ChanceToEndpointEdgeData, "chanceToEndpointEdge">,
+  "data"
+> & {
+  data: ChanceToEndpointEdgeData;
 };
 
-const ChanceEdge = ({
+const ChanceToEndpointEdge = ({
   id,
   sourceX,
   sourceY,
   targetX,
   targetY,
   data: { payoff, payoffType: payOffType },
-}: EdgeProps<TChanceEdge>) => {
+}: EdgeProps<TChanceToEndpointEdge>) => {
   const [edgePath] = getSimpleBezierPath({
     sourceX,
     sourceY,
@@ -64,4 +67,4 @@ const ChanceEdge = ({
   );
 };
 
-export default ChanceEdge;
+export default ChanceToEndpointEdge;

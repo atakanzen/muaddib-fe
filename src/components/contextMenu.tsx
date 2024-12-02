@@ -55,7 +55,7 @@ const ContextMenu = () => {
 
   return (
     <div
-      className="absolute h-64 w-44 bg-white border rounded z-50 p-2 shadow-funky"
+      className="absolute h-64 w-72 bg-white border rounded z-50 p-2 shadow-funky"
       style={{
         top: `${contextMenuPosition.y}px`,
         left: `${contextMenuPosition.x}px`,
@@ -64,10 +64,20 @@ const ContextMenu = () => {
       <span className="font-bold">Context Menu</span>
       <ul className="flex flex-col gap-2 mt-4 items-start justify-center">
         <li
-          onClick={(e) => handleAddNode(e, DECISION_NODE_TYPE)}
+          onClick={(e) =>
+            handleAddNode(e, DECISION_NODE_TYPE, { isRoot: true })
+          }
           className="border-b cursor-pointer hover:bg-gray-200 w-full"
         >
-          Decision Node
+          Root Decision Node
+        </li>
+        <li
+          onClick={(e) =>
+            handleAddNode(e, DECISION_NODE_TYPE, { isRoot: false })
+          }
+          className="border-b cursor-pointer hover:bg-gray-200 w-full"
+        >
+          Intermediary Decision Node
         </li>
         <li
           onClick={(e) => handleAddNode(e, CHANCE_NODE_TYPE)}

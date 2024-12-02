@@ -1,5 +1,6 @@
 import { ChangeEvent, useCallback } from "react";
-import { TChanceEdge } from "../edges/chance-edge";
+import { TChanceToChanceEdge } from "../edges/chance-to-chance-edge";
+import { TChanceToEndpointEdge } from "../edges/chance-to-endpoint-edge";
 import { useSourceNodeID } from "../hooks/useParentNode";
 import {
   changeProbabilityForChanceEdge,
@@ -16,9 +17,10 @@ const ChanceProbabilityInput = ({ edgeID }: ChanceProbabilityProps) => {
   const dispatch = useAppDispatch();
 
   const sourceNodeID = useSourceNodeID(edgeID) ?? "";
-  const edge: TChanceEdge | undefined = useAppSelector((state) =>
-    selectEdgeByID<TChanceEdge>(state, edgeID)
-  );
+  const edge: TChanceToEndpointEdge | TChanceToChanceEdge | undefined =
+    useAppSelector((state) =>
+      selectEdgeByID<TChanceToEndpointEdge>(state, edgeID)
+    );
 
   const handleOnChangeProbabilityInput = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {

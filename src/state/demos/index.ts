@@ -9,7 +9,9 @@ const sensorDemo: EditorState = {
         x: -400,
         y: 0,
       },
-      data: {},
+      data: {
+        isRoot: true,
+      },
     },
     {
       id: "2",
@@ -123,7 +125,7 @@ const sensorDemo: EditorState = {
       source: "2",
       target: "4",
       animated: true,
-      type: "chanceEdge",
+      type: "chanceToEndpointEdge",
       data: {
         probability: 50,
         isSetByUser: false,
@@ -136,7 +138,7 @@ const sensorDemo: EditorState = {
       source: "2",
       target: "5",
       animated: true,
-      type: "chanceEdge",
+      type: "chanceToEndpointEdge",
       data: {
         probability: 50,
         isSetByUser: false,
@@ -148,7 +150,7 @@ const sensorDemo: EditorState = {
       source: "3",
       target: "6",
       animated: true,
-      type: "chanceEdge",
+      type: "chanceToEndpointEdge",
       data: {
         probability: 80,
         isSetByUser: false,
@@ -161,7 +163,7 @@ const sensorDemo: EditorState = {
       source: "3",
       target: "7",
       animated: true,
-      type: "chanceEdge",
+      type: "chanceToEndpointEdge",
       data: {
         probability: 20,
         isSetByUser: false,

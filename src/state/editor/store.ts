@@ -9,18 +9,22 @@ import {
   Node,
   NodeChange,
 } from "@xyflow/react";
-import { TChanceEdge } from "../../edges/chance-edge";
+import { TChanceToChanceEdge } from "../../edges/chance-to-chance-edge";
+import { TChanceToEndpointEdge } from "../../edges/chance-to-endpoint-edge";
 import { TDecisionEdge } from "../../edges/decision-edge";
 import { TEndpointNode } from "../../nodes/endpoint-node";
 import {
-  calculateEVForChanceNode,
   calculateTotalPayoff,
   findConnectedEndpoints,
+  handleEdgeChange,
 } from "../../utils/ev-calculations";
 import { toFixedFloat } from "../../utils/toFixedFloat";
 import {
-  isChanceEdge,
+  isChanceNode,
+  isChanceToChanceEdge,
+  isChanceToEndpointEdge,
   isDecisionEdge,
+  isDecisionNode,
   isEndpointNode,
   isTextNode,
 } from "../../utils/type-guards";
@@ -52,10 +56,13 @@ export const editorSlice = createSlice({
       const edgesDeleted = action.payload;
 
       edgesDeleted.forEach((e) => {
-        if (isChanceEdge(e)) {
+        if (isChanceToEndpointEdge(e)) {
           const siblingChanceEdges = state.edges.filter(
-            (oe) => isChanceEdge(oe) && oe.id !== e.id && oe.source === e.source
-          ) as TChanceEdge[];
+            (oe) =>
+              isChanceToEndpointEdge(oe) &&
+              oe.id !== e.id &&
+              oe.source === e.source
+          ) as TChanceToEndpointEdge[];
 
           // Divide equally leftover sibling chance edges probability
           if (siblingChanceEdges.length > 0) {
@@ -80,15 +87,21 @@ export const editorSlice = createSlice({
       });
     },
     onConnect: (state, action: PayloadAction<Connection>) => {
-      const { source } = action.payload;
+      const { source, target } = action.payload;
       const sourceNode = state.nodes.find((n) => n.id === source);
+      const targetNode = state.nodes.find((n) => n.id === target);
 
       if (!sourceNode) {
         console.error("no source node find");
         return;
       }
 
-      if (sourceNode.type === "decisionNode") {
+      if (!targetNode) {
+        console.error("no target node find");
+        return;
+      }
+
+      if (isDecisionNode(sourceNode)) {
         state.edges = addEdge(
           {
             type: "decisionEdge",
@@ -98,10 +111,12 @@ export const editorSlice = createSlice({
           },
           state.edges
         );
-      } else if (sourceNode.type === "chanceNode") {
-        const siblingChanceEdges = state.edges
-          .filter(isChanceEdge)
-          .filter((e) => e.source === source);
+      } else if (isChanceNode(sourceNode) && isEndpointNode(targetNode)) {
+        const siblingChanceEdges = state.edges.filter(
+          (e) =>
+            e.source === source &&
+            (isChanceToEndpointEdge(e) || isChanceToChanceEdge(e))
+        ) as (TChanceToChanceEdge | TChanceToEndpointEdge)[];
 
         const totalSiblingProbability = siblingChanceEdges.reduce(
           (sum, edge) => sum + edge.data.probability,
@@ -115,12 +130,44 @@ export const editorSlice = createSlice({
 
         state.edges = addEdge(
           {
-            type: "chanceEdge",
+            type: "chanceToEndpointEdge",
             animated: true,
             data: {
               probability: newProbability,
               isSetByUser: false,
               payoff: 0,
+            },
+            ...action.payload,
+          },
+          state.edges
+        );
+      } else if (
+        isChanceNode(sourceNode) &&
+        (isChanceNode(targetNode) || isDecisionNode(targetNode))
+      ) {
+        const siblingChanceEdges = state.edges.filter(
+          (e) =>
+            e.source === source &&
+            (isChanceToEndpointEdge(e) || isChanceToChanceEdge(e))
+        ) as (TChanceToChanceEdge | TChanceToEndpointEdge)[];
+
+        const totalSiblingProbability = siblingChanceEdges.reduce(
+          (sum, edge) => sum + edge.data.probability,
+          0
+        );
+
+        const remainingProbability = 100 - totalSiblingProbability;
+
+        const newProbability =
+          remainingProbability > 0 ? remainingProbability : 0;
+
+        state.edges = addEdge(
+          {
+            type: "chanceToChanceEdge",
+            animated: true,
+            data: {
+              probability: newProbability,
+              isSetByUser: false,
             },
             ...action.payload,
           },
@@ -154,8 +201,10 @@ export const editorSlice = createSlice({
       const { edgeID, probability, sourceNodeID } = action.payload;
 
       const chanceEdge = state.edges.find(
-        (e) => e.id === edgeID && isChanceEdge(e)
-      ) as TChanceEdge | undefined;
+        (e) =>
+          e.id === edgeID &&
+          (isChanceToEndpointEdge(e) || isChanceToChanceEdge(e))
+      ) as TChanceToEndpointEdge | TChanceToChanceEdge | undefined;
 
       if (!chanceEdge) {
         console.error("no chance edge found");
@@ -168,12 +217,16 @@ export const editorSlice = createSlice({
       const remainingProbability = 100 - chanceEdge.data.probability;
 
       const otherChanceEdges = state.edges.filter((e) => {
-        if (!isChanceEdge(e) || e.source !== sourceNodeID || e.id === edgeID) {
+        if (
+          (!isChanceToEndpointEdge(e) && !isChanceToChanceEdge(e)) ||
+          e.source !== sourceNodeID ||
+          e.id === edgeID
+        ) {
           return false;
         }
 
         return true;
-      }) as TChanceEdge[];
+      }) as (TChanceToEndpointEdge | TChanceToChanceEdge)[];
 
       if (remainingProbability < 0) {
         console.log("Probabilities do not sum up to 100%"); // TODO: Handle this
@@ -191,7 +244,7 @@ export const editorSlice = createSlice({
         otherNode.data.probability = dividedProbability;
       });
 
-      calculateEVForChanceNode(sourceNodeID, state);
+      handleEdgeChange(edgeID, state);
     },
     changeInputForTextNode: (
       state,
@@ -236,6 +289,8 @@ export const editorSlice = createSlice({
           state.edges
         );
       });
+
+      handleEdgeChange(id, state);
     },
     changePayoffInputForChanceEdge: (
       state,
@@ -243,20 +298,20 @@ export const editorSlice = createSlice({
     ) => {
       const { id, value } = action.payload;
 
-      const chanceEdge = state.edges.find(
-        (e) => e.id === id && isChanceEdge(e)
-      ) as TChanceEdge | undefined;
+      const chanceToEndpointEdge = state.edges.find(
+        (e) => e.id === id && isChanceToEndpointEdge(e)
+      ) as TChanceToEndpointEdge | undefined;
 
-      if (!chanceEdge) {
-        console.error("chance edge not found");
+      if (!chanceToEndpointEdge) {
+        console.error("chance to endpoint edge not found");
         return;
       }
-      chanceEdge.data.payoff = value;
-      chanceEdge.data.payoffType =
+      chanceToEndpointEdge.data.payoff = value;
+      chanceToEndpointEdge.data.payoffType =
         value > 0 ? "profit" : value < 0 ? "cost" : undefined;
 
       const targetNode = state.nodes.find(
-        (n) => n.id === chanceEdge.target && isEndpointNode(n)
+        (n) => n.id === chanceToEndpointEdge.target && isEndpointNode(n)
       ) as TEndpointNode | undefined;
       if (targetNode) {
         targetNode.data.calculatedPayoff = calculateTotalPayoff(
@@ -265,10 +320,7 @@ export const editorSlice = createSlice({
         );
       }
 
-      const sourceNode = state.nodes.find((n) => n.id === chanceEdge.source);
-      if (sourceNode) {
-        calculateEVForChanceNode(sourceNode.id, state);
-      }
+      handleEdgeChange(id, state);
     },
   },
 });
