@@ -5,6 +5,7 @@ import {
   EdgeProps,
   getSimpleBezierPath,
 } from "@xyflow/react";
+import classNames from "classnames";
 import ChanceProbabilityInput from "../components/chance-probability-input";
 import { PayoffInput, PayoffType } from "../components/payoff-input";
 import { changePayoffInputForChanceEdge } from "../state/editor/store";
@@ -14,6 +15,7 @@ type ChanceToEndpointEdgeData = {
   isSetByUser: boolean;
   payoff: number;
   payoffType?: PayoffType;
+  isFaulty: boolean;
 };
 
 export type TChanceToEndpointEdge = Omit<
@@ -29,7 +31,8 @@ const ChanceToEndpointEdge = ({
   sourceY,
   targetX,
   targetY,
-  data: { payoff, payoffType: payOffType },
+  selected,
+  data: { payoff, payoffType: payOffType, isFaulty },
 }: EdgeProps<TChanceToEndpointEdge>) => {
   const [edgePath] = getSimpleBezierPath({
     sourceX,
@@ -43,7 +46,14 @@ const ChanceToEndpointEdge = ({
 
   return (
     <>
-      <BaseEdge id={id} path={edgePath} />
+      <BaseEdge
+        id={id}
+        path={edgePath}
+        className={classNames({
+          "stroke-red-500": isFaulty,
+          "!stroke-red-700": isFaulty && selected,
+        })}
+      />
       <EdgeLabelRenderer>
         <div
           className="absolute"

@@ -211,12 +211,10 @@ export const editorSlice = createSlice({
         return;
       }
 
-      chanceEdge.data.probability = Math.min(probability, 100);
+      chanceEdge.data.probability = probability;
       chanceEdge.data.isSetByUser = true;
 
-      const remainingProbability = 100 - chanceEdge.data.probability;
-
-      const otherChanceEdges = state.edges.filter((e) => {
+      const siblingChanceEdges = state.edges.filter((e) => {
         if (
           (!isChanceToEndpointEdge(e) && !isChanceToChanceEdge(e)) ||
           e.source !== sourceNodeID ||
@@ -228,21 +226,38 @@ export const editorSlice = createSlice({
         return true;
       }) as (TChanceToEndpointEdge | TChanceToChanceEdge)[];
 
-      if (remainingProbability < 0) {
-        console.log("Probabilities do not sum up to 100%"); // TODO: Handle this
+      // If in total 2 edges, automatically set the other one to leftover
+      if (siblingChanceEdges.length === 1) {
+        const remainingProbability = 100 - chanceEdge.data.probability;
+        const dividedProbability =
+          siblingChanceEdges.length > 0
+            ? toFixedFloat(
+                Math.max(remainingProbability / siblingChanceEdges.length, 0),
+                2
+              )
+            : 0;
+
+        siblingChanceEdges.forEach((sibling) => {
+          sibling.data.probability = dividedProbability;
+        });
       }
 
-      const dividedProbability =
-        otherChanceEdges.length > 0
-          ? toFixedFloat(
-              Math.max(remainingProbability / otherChanceEdges.length, 0),
-              2
-            )
-          : 0;
+      const totalSiblingProbability = siblingChanceEdges.reduce(
+        (acc, curr) => acc + curr.data.probability,
+        probability
+      );
 
-      otherChanceEdges.forEach((otherNode) => {
-        otherNode.data.probability = dividedProbability;
-      });
+      if (totalSiblingProbability !== 100) {
+        siblingChanceEdges.forEach((sibling) => (sibling.data.isFaulty = true));
+        chanceEdge.data.isFaulty = true;
+        handleEdgeChange(edgeID, state, true);
+        return;
+      } else if (totalSiblingProbability === 100) {
+        siblingChanceEdges.forEach(
+          (sibling) => (sibling.data.isFaulty = false)
+        );
+        chanceEdge.data.isFaulty = false;
+      }
 
       handleEdgeChange(edgeID, state);
     },
@@ -306,6 +321,7 @@ export const editorSlice = createSlice({
         console.error("chance to endpoint edge not found");
         return;
       }
+
       chanceToEndpointEdge.data.payoff = value;
       chanceToEndpointEdge.data.payoffType =
         value > 0 ? "profit" : value < 0 ? "cost" : undefined;

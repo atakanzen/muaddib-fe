@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback } from "react";
+import { ChangeEvent, useCallback, useMemo } from "react";
 import { TChanceToChanceEdge } from "../edges/chance-to-chance-edge";
 import { TChanceToEndpointEdge } from "../edges/chance-to-endpoint-edge";
 import { useSourceNodeID } from "../hooks/useParentNode";
@@ -19,7 +19,7 @@ const ChanceProbabilityInput = ({ edgeID }: ChanceProbabilityProps) => {
   const sourceNodeID = useSourceNodeID(edgeID) ?? "";
   const edge: TChanceToEndpointEdge | TChanceToChanceEdge | undefined =
     useAppSelector((state) =>
-      selectEdgeByID<TChanceToEndpointEdge>(state, edgeID)
+      selectEdgeByID<TChanceToEndpointEdge | TChanceToChanceEdge>(state, edgeID)
     );
 
   const handleOnChangeProbabilityInput = useCallback(
@@ -38,21 +38,11 @@ const ChanceProbabilityInput = ({ edgeID }: ChanceProbabilityProps) => {
     },
     [dispatch, edgeID, sourceNodeID]
   );
-  const probability = edge?.data.probability ?? 0;
 
-  const handleOnBlur = useCallback(() => {
-    // Ensure the displayed value stays within bounds on blur
-    if (probability < 0 || probability > 100) {
-      const clampedValue = Math.max(0, Math.min(probability, 100));
-      dispatch(
-        changeProbabilityForChanceEdge({
-          edgeID,
-          probability: clampedValue,
-          sourceNodeID,
-        })
-      );
-    }
-  }, [dispatch, edgeID, probability, sourceNodeID]);
+  const probability = useMemo(
+    () => edge?.data.probability ?? 0,
+    [edge?.data.probability]
+  );
 
   return (
     <div className="absolute text-xss w-16 pointer-events-auto">
@@ -63,7 +53,6 @@ const ChanceProbabilityInput = ({ edgeID }: ChanceProbabilityProps) => {
         min={0}
         max={100}
         onChange={handleOnChangeProbabilityInput}
-        onBlur={handleOnBlur}
       />
       <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">
         %

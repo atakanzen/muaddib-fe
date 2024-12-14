@@ -13,9 +13,10 @@ export const DecisionNode = ({
   selected,
   id,
 }: NodeProps<TDecisionNode>) => {
+  console.log(ev);
   return (
-    <div data-isRoot={isRoot} className="relative">
-      {ev && (
+    <div data-isroot={isRoot} className="relative">
+      {ev !== undefined && (
         <span className="absolute right-full top-1/2 -translate-y-1/2 mr-2 nodrag hover:cursor-default select-text border border-slate-600 p-1 bg-slate-500 rounded font-semibold text-white text-xss w-22 truncate">
           EV: ${Intl.NumberFormat("en-US").format(ev)}
         </span>

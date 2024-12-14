@@ -3,7 +3,6 @@ import { TChanceToChanceEdge } from "../edges/chance-to-chance-edge";
 import { TChanceToEndpointEdge } from "../edges/chance-to-endpoint-edge";
 import { TEndpointNode } from "../nodes/endpoint-node";
 import { EditorState } from "../state/editor/store";
-import { toFixedFloat } from "./toFixedFloat";
 import {
   isChanceNode,
   isChanceToChanceEdge,
@@ -53,7 +52,11 @@ const findConnectedEndpoints = (
   return endpoints;
 };
 
-function handleEdgeChange(edgeID: string, state: EditorState) {
+function handleEdgeChange(
+  edgeID: string,
+  state: EditorState,
+  isFaultyProbability?: boolean
+) {
   const edge = state.edges.find((e) => e.id === edgeID);
   if (!edge) {
     console.error("Edge not found");
@@ -63,14 +66,15 @@ function handleEdgeChange(edgeID: string, state: EditorState) {
   if (isDecisionEdge(edge)) {
     recalculateFromNode(edge.target, state, new Set());
   } else if (isChanceToChanceEdge(edge) || isChanceToEndpointEdge(edge)) {
-    recalculateFromNode(edge.source, state, new Set());
+    recalculateFromNode(edge.source, state, new Set(), isFaultyProbability);
   }
 }
 
 function recalculateFromNode(
   nodeID: string,
   state: EditorState,
-  visited: Set<string>
+  visited: Set<string>,
+  isFaultyProbability?: boolean
 ) {
   if (visited.has(nodeID)) return;
   visited.add(nodeID);
@@ -84,9 +88,17 @@ function recalculateFromNode(
       state.edges
     );
   } else if (isChanceNode(currentNode)) {
-    currentNode.data.ev = calculateEVForChanceNode(nodeID, state);
+    if (isFaultyProbability) {
+      currentNode.data.ev = undefined;
+    } else {
+      currentNode.data.ev = calculateEVForChanceNode(nodeID, state);
+    }
   } else if (isDecisionNode(currentNode)) {
-    currentNode.data.ev = calculateEVForDecisionNode(nodeID, state);
+    if (isFaultyProbability) {
+      currentNode.data.ev = undefined;
+    } else {
+      currentNode.data.ev = calculateEVForDecisionNode(nodeID, state);
+    }
   }
 
   // Propagate upwards through all connected edges
@@ -135,49 +147,4 @@ function calculateEVForDecisionNode(
   }, Number.NEGATIVE_INFINITY);
 }
 
-function calculateEV(nodeID: string, state: EditorState) {
-  const node = state.nodes.find((n) => n.id === nodeID);
-  if (!node || !isChanceNode(node)) return;
-
-  const outgoingEdges = state.edges.filter(
-    (e) => e.source === nodeID && isChanceToEndpointEdge(e)
-  ) as TChanceToEndpointEdge[];
-
-  if (outgoingEdges.length === 0) {
-    // Base case: no outgoing edges
-    node.data.ev = 0;
-    return;
-  }
-
-  const totalEV = outgoingEdges.reduce((sum, edge) => {
-    const targetNode = state.nodes.find(
-      (n) => n.id === edge.target && isEndpointNode(n)
-    ) as TEndpointNode | undefined;
-
-    if (!targetNode) {
-      console.warn(`Target endpoint node not found for edge ${edge.id}`);
-      return sum; // Skip edge if target node is missing or not an endpoint
-    }
-
-    const calculatedTotalPayoff = targetNode.data.calculatedPayoff ?? 0;
-    const edgeProbability = edge.data.probability ?? 0;
-
-    // Calculate the contribution of this edge to the EV
-    const edgeEVContribution = (edgeProbability / 100) * calculatedTotalPayoff;
-
-    return sum + edgeEVContribution;
-  }, 0);
-
-  node.data.ev = toFixedFloat(totalEV, 2);
-
-  // Propagate EV calculation to parent nodes (reverse propagation)
-  const incomingEdges = state.edges.filter((e) => e.target === nodeID);
-  incomingEdges.forEach((edge) => calculateEV(edge.source, state));
-}
-
-export {
-  calculateEV,
-  calculateTotalPayoff,
-  findConnectedEndpoints,
-  handleEdgeChange,
-};
+export { calculateTotalPayoff, findConnectedEndpoints, handleEdgeChange };

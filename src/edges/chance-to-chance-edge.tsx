@@ -5,11 +5,13 @@ import {
   EdgeProps,
   getSimpleBezierPath,
 } from "@xyflow/react";
+import classNames from "classnames";
 import ChanceProbabilityInput from "../components/chance-probability-input";
 
 type ChanceToChanceEdgeData = {
   probability: number;
   isSetByUser: boolean;
+  isFaulty: boolean;
 };
 
 export type TChanceToChanceEdge = Omit<
@@ -25,6 +27,8 @@ const ChanceToChanceEdge = ({
   sourceY,
   targetX,
   targetY,
+  selected,
+  data: { isFaulty },
 }: EdgeProps<TChanceToChanceEdge>) => {
   const [edgePath] = getSimpleBezierPath({
     sourceX,
@@ -38,7 +42,14 @@ const ChanceToChanceEdge = ({
 
   return (
     <>
-      <BaseEdge id={id} path={edgePath} />
+      <BaseEdge
+        id={id}
+        path={edgePath}
+        className={classNames({
+          "stroke-red-500": isFaulty,
+          "!stroke-red-700": isFaulty && selected,
+        })}
+      />
       <EdgeLabelRenderer>
         <div
           className="absolute"
