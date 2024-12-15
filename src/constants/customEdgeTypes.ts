@@ -1,8 +1,12 @@
 import { EdgeTypes } from "@xyflow/react";
-import BezierEdge from "../edges/straight-edge";
+import ChanceToChanceEdge from "../edges/chance-to-chance-edge";
+import ChanceToEndpointEdge from "../edges/chance-to-endpoint-edge";
+import DecisionEdge from "../edges/decision-edge";
 
 const customEdgeTypes: EdgeTypes = {
-  bezierEdge: BezierEdge,
+  decisionEdge: DecisionEdge,
+  chanceToEndpointEdge: ChanceToEndpointEdge,
+  chanceToChanceEdge: ChanceToChanceEdge,
 };
 
 export { customEdgeTypes };
