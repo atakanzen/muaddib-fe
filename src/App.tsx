@@ -3,19 +3,12 @@ import {
   BackgroundVariant,
   Controls,
   MiniMap,
-  Panel,
   ReactFlow,
-  useReactFlow,
 } from "@xyflow/react";
-import {
-  MouseEvent,
-  MouseEventHandler,
-  useCallback,
-  useMemo,
-  useRef,
-} from "react";
+import { MouseEvent, useCallback, useMemo, useRef } from "react";
 
 import ContextMenu from "./components/contextMenu";
+import Navbar from "./components/navbar";
 import { customEdgeTypes } from "./constants/customEdgeTypes";
 import { customNodeTypes } from "./constants/customNodeTypes";
 import {
@@ -33,7 +26,7 @@ import { useAppDispatch, useAppSelector } from "./state/hooks";
 
 function App() {
   const rfRef = useRef<HTMLDivElement | null>(null);
-  const instance = useReactFlow();
+  // const instance = useReactFlow();
   const nodes = useAppSelector(selectNodes);
   const edges = useAppSelector(selectEdges);
   const dispatch = useAppDispatch();
@@ -41,11 +34,6 @@ function App() {
 
   const nodeTypes = useMemo(() => customNodeTypes, []);
   const edgeTypes = useMemo(() => customEdgeTypes, []);
-
-  const handleLogCurrentState: MouseEventHandler<HTMLElement> = (e) => {
-    e.preventDefault();
-    console.log(instance.toObject());
-  };
 
   const handleOnContextMenu = (e: MouseEvent | globalThis.MouseEvent) => {
     e.preventDefault();
@@ -69,6 +57,7 @@ function App() {
 
   return (
     <div className="w-screen h-screen">
+      <Navbar />
       <ReactFlow
         ref={rfRef}
         nodeTypes={nodeTypes}
@@ -93,23 +82,6 @@ function App() {
         />
         <MiniMap />
         <Controls />
-        <Panel
-          position="top-right"
-          className="flex gap-2 items-center justify-between"
-        >
-          <button
-            className="bg-orange-500 py-1 px-2 rounded-md text-white font-semibold"
-            onClick={handleLogCurrentState}
-          >
-            Log current state
-          </button>
-          <button
-            className="bg-orange-500 py-1 px-2 rounded-md text-white font-semibold"
-            onClick={() => alert("in development")}
-          >
-            Save
-          </button>
-        </Panel>
       </ReactFlow>
     </div>
   );
