@@ -6,8 +6,11 @@ import {
   getSimpleBezierPath,
 } from "@xyflow/react";
 import classNames from "classnames";
-import ChanceProbabilityInput from "../components/chance-probability-input";
-import { PayoffInput, PayoffType } from "../components/payoff-input";
+import ChanceProbabilityInput from "../components/decision-tree/chance-probability-input";
+import {
+  PayoffInput,
+  PayoffType,
+} from "../components/decision-tree/payoff-input";
 import { changePayoffInputForChanceEdge } from "../state/editor/store";
 
 type ChanceToEndpointEdgeData = {

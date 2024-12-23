@@ -7,8 +7,9 @@ import {
 } from "@xyflow/react";
 import { MouseEvent, useCallback, useMemo, useRef } from "react";
 
-import ContextMenu from "./components/contextMenu";
-import Navbar from "./components/navbar";
+import ContextMenu from "./components/shared/contextMenu";
+import Navbar from "./components/shared/navbar";
+import NodeMenu from "./components/shared/node-menu";
 import { customEdgeTypes } from "./constants/customEdgeTypes";
 import { customNodeTypes } from "./constants/customNodeTypes";
 import {
@@ -58,6 +59,7 @@ function App() {
   return (
     <div className="w-screen h-screen">
       <Navbar />
+      <NodeMenu />
       <ReactFlow
         ref={rfRef}
         nodeTypes={nodeTypes}

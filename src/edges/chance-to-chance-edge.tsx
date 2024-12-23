@@ -6,7 +6,7 @@ import {
   getSimpleBezierPath,
 } from "@xyflow/react";
 import classNames from "classnames";
-import ChanceProbabilityInput from "../components/chance-probability-input";
+import ChanceProbabilityInput from "../components/decision-tree/chance-probability-input";
 
 type ChanceToChanceEdgeData = {
   probability: number;

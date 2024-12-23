@@ -1,13 +1,13 @@
 import { ChangeEvent, useCallback, useMemo } from "react";
-import { TChanceToChanceEdge } from "../edges/chance-to-chance-edge";
-import { TChanceToEndpointEdge } from "../edges/chance-to-endpoint-edge";
-import { useSourceNodeID } from "../hooks/useParentNode";
+import { TChanceToChanceEdge } from "../../edges/chance-to-chance-edge";
+import { TChanceToEndpointEdge } from "../../edges/chance-to-endpoint-edge";
+import { useSourceNodeID } from "../../hooks/useParentNode";
 import {
   changeProbabilityForChanceEdge,
   selectEdgeByID,
-} from "../state/editor/store";
-import { useAppDispatch, useAppSelector } from "../state/hooks";
-import { validateProbability } from "../utils/validation";
+} from "../../state/editor/store";
+import { useAppDispatch, useAppSelector } from "../../state/hooks";
+import { validateProbability } from "../../utils/validation";
 
 interface ChanceProbabilityProps {
   edgeID: string;
