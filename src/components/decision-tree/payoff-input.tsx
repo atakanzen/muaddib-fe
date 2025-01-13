@@ -1,7 +1,7 @@
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import classNames from "classnames";
 import { ChangeEvent, useCallback, useState } from "react";
-import { useAppDispatch } from "../state/hooks";
+import { useAppDispatch } from "../../state/hooks";
 
 export type PayoffType = "cost" | "profit";
 

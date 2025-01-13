@@ -5,13 +5,13 @@ import {
   DECISION_NODE_TYPE,
   ENDPOINT_NODE_TYPE,
   TEXT_NODE_TYPE,
-} from "../constants/customNodeTypes";
+} from "../../constants/customNodeTypes";
 import {
   addNode,
   hidePaneContextMenu,
   selectPaneContextPosition,
-} from "../state/editor/store";
-import { useAppDispatch, useAppSelector } from "../state/hooks";
+} from "../../state/editor/store";
+import { useAppDispatch, useAppSelector } from "../../state/hooks";
 
 const ContextMenu = () => {
   const contextMenuPosition = useAppSelector(selectPaneContextPosition);

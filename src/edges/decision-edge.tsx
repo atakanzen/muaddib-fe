@@ -5,7 +5,10 @@ import {
   EdgeProps,
   getSimpleBezierPath,
 } from "@xyflow/react";
-import { PayoffInput, PayoffType } from "../components/payoff-input";
+import {
+  PayoffInput,
+  PayoffType,
+} from "../components/decision-tree/payoff-input";
 import { changePayoffInputForDecisionEdge } from "../state/editor/store";
 
 type DecisionEdgeData = {
