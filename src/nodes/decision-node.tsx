@@ -13,7 +13,6 @@ export const DecisionNode = ({
   selected,
   id,
 }: NodeProps<TDecisionNode>) => {
-  console.log(ev);
   return (
     <div data-isroot={isRoot} className="relative">
       {ev !== undefined && (

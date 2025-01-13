@@ -8,6 +8,7 @@ import "./index.css";
 import About from "./pages/About.tsx";
 import Editor from "./pages/Editor.tsx";
 import Home from "./pages/Home.tsx";
+import NotFound from "./pages/NotFound.tsx";
 import { store } from "./state/store.ts";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
@@ -19,6 +20,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="/" Component={Home} />
             <Route path="/editor" Component={Editor} />
             <Route path="/about-us" Component={About} />
+            <Route path="*" Component={NotFound} />
           </Routes>
         </ReactFlowProvider>
       </Provider>
