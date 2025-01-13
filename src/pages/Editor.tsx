@@ -8,7 +8,6 @@ import {
 import { MouseEvent, useCallback, useMemo, useRef } from "react";
 
 import ContextMenu from "../components/shared/contextMenu";
-import Navbar from "../components/shared/navbar";
 import { customEdgeTypes } from "../constants/customEdgeTypes";
 import { customNodeTypes } from "../constants/customNodeTypes";
 import {
@@ -56,34 +55,31 @@ function Editor() {
   );
 
   return (
-    <div className="w-screen h-screen">
-      <Navbar />
-      <ReactFlow
-        ref={rfRef}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        nodes={nodes}
-        edges={edges}
-        onConnect={(conn) => dispatch(onConnect(conn))}
-        onNodesChange={(ch) => dispatch(onNodesChange(ch))}
-        onEdgesChange={(ch) => dispatch(onEdgesChange(ch))}
-        onEdgesDelete={(edges) => dispatch(onEdgesDelete(edges))}
-        onPaneContextMenu={handleOnContextMenu}
-        onPaneClick={onPaneClick}
-        proOptions={{ hideAttribution: true }}
-        fitView
-      >
-        {paneContextMenuVisible && <ContextMenu />}
-        <Background
-          variant={BackgroundVariant.Dots}
-          color="rgba(10,10,10, 0.5)"
-          gap={12}
-          size={1}
-        />
-        <MiniMap />
-        <Controls />
-      </ReactFlow>
-    </div>
+    <ReactFlow
+      ref={rfRef}
+      nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
+      nodes={nodes}
+      edges={edges}
+      onConnect={(conn) => dispatch(onConnect(conn))}
+      onNodesChange={(ch) => dispatch(onNodesChange(ch))}
+      onEdgesChange={(ch) => dispatch(onEdgesChange(ch))}
+      onEdgesDelete={(edges) => dispatch(onEdgesDelete(edges))}
+      onPaneContextMenu={handleOnContextMenu}
+      onPaneClick={onPaneClick}
+      proOptions={{ hideAttribution: true }}
+      fitView
+    >
+      {paneContextMenuVisible && <ContextMenu />}
+      <Background
+        variant={BackgroundVariant.Dots}
+        color="rgba(10,10,10, 0.5)"
+        gap={12}
+        size={1}
+      />
+      <MiniMap />
+      <Controls />
+    </ReactFlow>
   );
 }
 

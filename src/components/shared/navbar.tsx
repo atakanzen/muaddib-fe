@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { NavLink } from "react-router";
+import { Link, NavLink } from "react-router";
 
 const links = [
   {
@@ -19,8 +19,11 @@ const links = [
 const Navbar = () => {
   return (
     <div className="absolute z-50 top-0 left-0 w-full h-20 bg-slate-50 border-b-4 border-black flex items-center justify-between p-4">
-      <div>
-        <h1 className="font-serif font-extrabold text-2xl">Muaddib</h1>
+      <div className="flex items-center justify-center gap-2">
+        <h1 className="font-serif font-extrabold text-2xl leading-none">
+          Muad'dib
+        </h1>
+        <p className="text-gray-400">subject to change</p>
       </div>
       <div className="text-xl">
         <nav className="flex gap-2">
@@ -41,9 +44,12 @@ const Navbar = () => {
         </nav>
       </div>
       <div>
-        <p className="bg-gradient-to-r select-none from-amber-500 to-yellow-500 px-4 py-2  font-bold ">
-          subject to change
-        </p>
+        <Link
+          className="bg-amber-500 border border-black rounded cursor-pointer px-4 py-2"
+          to="/auth"
+        >
+          Sign Out
+        </Link>
       </div>
     </div>
   );

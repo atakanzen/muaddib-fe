@@ -1,12 +1,7 @@
-import Navbar from "../components/shared/navbar";
-
 const About = () => {
   return (
-    <div className="w-screen h-screen">
-      <Navbar />
-      <div className="h-full flex items-center justify-center">
-        <h1 className="text-6xl">About Us</h1>
-      </div>
+    <div className="h-full flex flex-col items-center justify-center">
+      <h1 className="text-5xl font-bold">About Us</h1>
     </div>
   );
 };

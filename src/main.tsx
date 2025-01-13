@@ -6,8 +6,10 @@ import { Provider } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router";
 import "./index.css";
 import About from "./pages/About.tsx";
+import Auth from "./pages/Auth.tsx";
 import Editor from "./pages/Editor.tsx";
 import Home from "./pages/Home.tsx";
+import Layout from "./pages/Layout.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { store } from "./state/store.ts";
 
@@ -17,10 +19,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <Provider store={store}>
         <ReactFlowProvider>
           <Routes>
-            <Route path="/" Component={Home} />
-            <Route path="/editor" Component={Editor} />
-            <Route path="/about-us" Component={About} />
-            <Route path="*" Component={NotFound} />
+            <Route path="/auth" Component={Auth} />
+            <Route element={<Layout />}>
+              <Route path="/" Component={Home} />
+              <Route path="/editor" Component={Editor} />
+              <Route path="/about-us" Component={About} />
+              <Route path="*" Component={NotFound} />
+            </Route>
           </Routes>
         </ReactFlowProvider>
       </Provider>
