@@ -7,8 +7,8 @@ import {
 } from "@xyflow/react";
 import { MouseEvent, useCallback, useMemo, useRef } from "react";
 
-import ContextMenu from "./components/contextMenu";
-import Navbar from "./components/navbar";
+import ContextMenu from "./components/shared/contextMenu";
+import Navbar from "./components/shared/navbar";
 import { customEdgeTypes } from "./constants/customEdgeTypes";
 import { customNodeTypes } from "./constants/customNodeTypes";
 import {
