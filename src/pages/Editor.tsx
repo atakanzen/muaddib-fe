@@ -7,10 +7,10 @@ import {
 } from "@xyflow/react";
 import { MouseEvent, useCallback, useMemo, useRef } from "react";
 
-import ContextMenu from "./components/shared/contextMenu";
-import Navbar from "./components/shared/navbar";
-import { customEdgeTypes } from "./constants/customEdgeTypes";
-import { customNodeTypes } from "./constants/customNodeTypes";
+import ContextMenu from "../components/shared/contextMenu";
+import Navbar from "../components/shared/navbar";
+import { customEdgeTypes } from "../constants/customEdgeTypes";
+import { customNodeTypes } from "../constants/customNodeTypes";
 import {
   hidePaneContextMenu,
   onConnect,
@@ -21,10 +21,10 @@ import {
   selectNodes,
   selectPaneContextVisible,
   showPaneContextMenu,
-} from "./state/editor/store";
-import { useAppDispatch, useAppSelector } from "./state/hooks";
+} from "../state/editor/store";
+import { useAppDispatch, useAppSelector } from "../state/hooks";
 
-function App() {
+function Editor() {
   const rfRef = useRef<HTMLDivElement | null>(null);
   // const instance = useReactFlow();
   const nodes = useAppSelector(selectNodes);
@@ -87,4 +87,4 @@ function App() {
   );
 }
 
-export default App;
+export default Editor;
