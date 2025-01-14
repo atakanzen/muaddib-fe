@@ -1,9 +1,29 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useAuth } from "../hooks/useAuth";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const { login } = useAuth();
   let navigate = useNavigate();
+
+  const handleSubmit = async (formData: FormData) => {
+    const authEndpoint = isLogin ? "auth/login" : "auth/register";
+    const response = await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/${authEndpoint}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: formData.get("username"),
+          password: formData.get("password"),
+        }),
+      }
+    );
+    console.log(await response.json());
+    // login("TEST_TOKEN");
+    // navigate("/");
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center">
@@ -12,7 +32,7 @@ const Auth = () => {
         <h2 className="text-2xl font-bold text-center mb-6">
           {isLogin ? "Login" : "Sign Up"}
         </h2>
-        <form className="space-y-4">
+        <form action={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Username
@@ -22,6 +42,7 @@ const Auth = () => {
               className="bg-white mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500"
               placeholder="Enter your Username"
               required
+              name="username"
             />
           </div>
           <div>
@@ -33,6 +54,7 @@ const Auth = () => {
               className="bg-white mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500"
               placeholder="Enter your password"
               required
+              name="password"
             />
           </div>
           {!isLogin && (
@@ -45,13 +67,13 @@ const Auth = () => {
                 className="bg-white mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500"
                 placeholder="Confirm your password"
                 required
+                name="confirmPassword"
               />
             </div>
           )}
           <button
             type="submit"
             className="w-full bg-amber-600 text-white py-2 rounded-md shadow hover:bg-amber-700 transition"
-            onClick={() => navigate("/")}
           >
             {isLogin ? "Login" : "Sign Up"}
           </button>

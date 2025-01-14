@@ -1,5 +1,7 @@
 import classNames from "classnames";
-import { Link, NavLink } from "react-router";
+import { MouseEventHandler } from "react";
+import { NavLink, useNavigate } from "react-router";
+import { useAuth } from "../../hooks/useAuth";
 
 const links = [
   {
@@ -17,12 +19,19 @@ const links = [
 ];
 
 const Navbar = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.preventDefault();
+    logout();
+    navigate("/");
+  };
+
   return (
     <div className="absolute z-50 top-0 left-0 w-full h-20 bg-slate-50 border-b-4 border-black flex items-center justify-between p-4">
       <div className="flex items-center justify-center gap-2">
-        <h1 className="font-serif font-extrabold text-2xl leading-none">
-          Muad'dib
-        </h1>
+        <h1 className="font-serif font-extrabold text-2xl ">Muad'dib</h1>
         <p className="text-gray-400">subject to change</p>
       </div>
       <div className="text-xl">
@@ -44,12 +53,12 @@ const Navbar = () => {
         </nav>
       </div>
       <div>
-        <Link
+        <button
           className="bg-amber-500 border border-black rounded cursor-pointer px-4 py-2"
-          to="/auth"
+          onClick={handleSignOut}
         >
           Sign Out
-        </Link>
+        </button>
       </div>
     </div>
   );
