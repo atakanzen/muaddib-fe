@@ -7,10 +7,9 @@ import {
 } from "@xyflow/react";
 import { MouseEvent, useCallback, useMemo, useRef } from "react";
 
-import ContextMenu from "./components/shared/contextMenu";
-import Navbar from "./components/shared/navbar";
-import { customEdgeTypes } from "./constants/customEdgeTypes";
-import { customNodeTypes } from "./constants/customNodeTypes";
+import ContextMenu from "../components/shared/contextMenu";
+import { customEdgeTypes } from "../constants/customEdgeTypes";
+import { customNodeTypes } from "../constants/customNodeTypes";
 import {
   hidePaneContextMenu,
   onConnect,
@@ -21,10 +20,10 @@ import {
   selectNodes,
   selectPaneContextVisible,
   showPaneContextMenu,
-} from "./state/editor/store";
-import { useAppDispatch, useAppSelector } from "./state/hooks";
+} from "../state/editor/store";
+import { useAppDispatch, useAppSelector } from "../state/hooks";
 
-function App() {
+function Editor() {
   const rfRef = useRef<HTMLDivElement | null>(null);
   // const instance = useReactFlow();
   const nodes = useAppSelector(selectNodes);
@@ -56,35 +55,32 @@ function App() {
   );
 
   return (
-    <div className="w-screen h-screen">
-      <Navbar />
-      <ReactFlow
-        ref={rfRef}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        nodes={nodes}
-        edges={edges}
-        onConnect={(conn) => dispatch(onConnect(conn))}
-        onNodesChange={(ch) => dispatch(onNodesChange(ch))}
-        onEdgesChange={(ch) => dispatch(onEdgesChange(ch))}
-        onEdgesDelete={(edges) => dispatch(onEdgesDelete(edges))}
-        onPaneContextMenu={handleOnContextMenu}
-        onPaneClick={onPaneClick}
-        proOptions={{ hideAttribution: true }}
-        fitView
-      >
-        {paneContextMenuVisible && <ContextMenu />}
-        <Background
-          variant={BackgroundVariant.Dots}
-          color="rgba(10,10,10, 0.5)"
-          gap={12}
-          size={1}
-        />
-        <MiniMap />
-        <Controls />
-      </ReactFlow>
-    </div>
+    <ReactFlow
+      ref={rfRef}
+      nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
+      nodes={nodes}
+      edges={edges}
+      onConnect={(conn) => dispatch(onConnect(conn))}
+      onNodesChange={(ch) => dispatch(onNodesChange(ch))}
+      onEdgesChange={(ch) => dispatch(onEdgesChange(ch))}
+      onEdgesDelete={(edges) => dispatch(onEdgesDelete(edges))}
+      onPaneContextMenu={handleOnContextMenu}
+      onPaneClick={onPaneClick}
+      proOptions={{ hideAttribution: true }}
+      fitView
+    >
+      {paneContextMenuVisible && <ContextMenu />}
+      <Background
+        variant={BackgroundVariant.Dots}
+        color="rgba(10,10,10, 0.5)"
+        gap={12}
+        size={1}
+      />
+      <MiniMap />
+      <Controls />
+    </ReactFlow>
   );
 }
 
-export default App;
+export default Editor;
