@@ -1,28 +1,58 @@
-import { useState } from "react";
+import {
+  ChangeEventHandler,
+  FormEventHandler,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from "../hooks/useAuth";
+import { authenticate } from "../lib/main";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const usernameRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const confirmPasswordRef = useRef<HTMLInputElement>(null);
+  const [isPending, startTransition] = useTransition();
   const { login } = useAuth();
   let navigate = useNavigate();
 
-  const handleSubmit = async (formData: FormData) => {
-    const authEndpoint = isLogin ? "auth/login" : "auth/register";
-    const response = await fetch(
-      `${import.meta.env.VITE_BACKEND_URL}/${authEndpoint}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: formData.get("username"),
-          password: formData.get("password"),
-        }),
+  const handleSubmit: FormEventHandler = (e) => {
+    e.preventDefault();
+
+    if (!isLogin) {
+      const password = passwordRef.current?.value || "";
+      const confirmPassword = confirmPasswordRef.current?.value || "";
+
+      if (password !== confirmPassword) {
+        setError("Passwords do not match.");
+        return;
       }
-    );
-    console.log(await response.json());
-    // login("TEST_TOKEN");
-    // navigate("/");
+    }
+
+    startTransition(async () => {
+      const authEndpoint = isLogin ? "auth/login" : "auth/register";
+      try {
+        const bearer = await authenticate(authEndpoint, {
+          username: usernameRef.current?.value || "",
+          password: passwordRef.current?.value || "",
+        });
+
+        login(bearer);
+        navigate("/");
+      } catch (error: any) {
+        setError(error.message);
+      }
+    });
+  };
+
+  const handleOnChange: ChangeEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
+    if (error) {
+      setError(null);
+    }
   };
 
   return (
@@ -32,7 +62,11 @@ const Auth = () => {
         <h2 className="text-2xl font-bold text-center mb-6">
           {isLogin ? "Login" : "Sign Up"}
         </h2>
-        <form action={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          onChange={handleOnChange}
+          className="space-y-4"
+        >
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Username
@@ -43,6 +77,7 @@ const Auth = () => {
               placeholder="Enter your Username"
               required
               name="username"
+              ref={usernameRef}
             />
           </div>
           <div>
@@ -55,6 +90,7 @@ const Auth = () => {
               placeholder="Enter your password"
               required
               name="password"
+              ref={passwordRef}
             />
           </div>
           {!isLogin && (
@@ -68,15 +104,18 @@ const Auth = () => {
                 placeholder="Confirm your password"
                 required
                 name="confirmPassword"
+                ref={confirmPasswordRef}
               />
             </div>
           )}
           <button
             type="submit"
             className="w-full bg-amber-600 text-white py-2 rounded-md shadow hover:bg-amber-700 transition"
+            disabled={isPending}
           >
             {isLogin ? "Login" : "Sign Up"}
           </button>
+          {error && <p className="text-red-500 text-center">{error}</p>}
         </form>
         <p className="text-center text-sm text-gray-600 mt-4">
           {isLogin ? (

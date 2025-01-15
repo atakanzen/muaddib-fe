@@ -1,5 +1,6 @@
 import classNames from "classnames";
-import { MouseEventHandler } from "react";
+import { jwtDecode } from "jwt-decode";
+import { MouseEventHandler, useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -22,11 +23,30 @@ const Navbar = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
+  const [isTooltipVisible, setTooltipVisible] = useState(false);
+
   const handleSignOut: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault();
     logout();
     navigate("/");
   };
+
+  // Decode JWT to get the user's name
+  const getUsername = (): string | null => {
+    const token = sessionStorage.getItem("authToken");
+    if (!token) return null;
+
+    try {
+      const decoded: any = jwtDecode(token);
+      return decoded?.username || "";
+    } catch (error) {
+      console.error("Error decoding JWT:", error);
+      return null;
+    }
+  };
+
+  const username = getUsername();
+  const userInitial = username ? username.charAt(0).toUpperCase() : "";
 
   return (
     <div className="absolute z-50 top-0 left-0 w-full h-20 bg-slate-50 border-b-4 border-black flex items-center justify-between p-4">
@@ -52,13 +72,29 @@ const Navbar = () => {
           ))}
         </nav>
       </div>
-      <div>
+      <div className="flex items-center gap-4">
         <button
           className="bg-amber-500 border border-black rounded cursor-pointer px-4 py-2"
           onClick={handleSignOut}
         >
           Sign Out
         </button>
+        {username && (
+          <div
+            className="relative group"
+            onMouseEnter={() => setTooltipVisible(true)}
+            onMouseLeave={() => setTooltipVisible(false)}
+          >
+            <div className="w-10 h-10 bg-amber-500 text-white rounded-full flex items-center justify-center font-bold select-none">
+              {userInitial}
+            </div>
+            {isTooltipVisible && (
+              <div className="absolute top-12 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-sm rounded-md px-2 py-1">
+                {username}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
