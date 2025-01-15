@@ -24,7 +24,6 @@ export const ChanceNode = ({
           type="target"
           position={Position.Left}
           connectionCount={1}
-          onConnect={() => alert("connect")}
         />
         <Handle type="source" position={Position.Right} />
       </div>

@@ -35,6 +35,10 @@ const isChanceToChanceEdge = (edge: Edge): edge is TChanceToChanceEdge => {
   return edge.type === "chanceToChanceEdge";
 };
 
+const isStringArray = (message: string[] | string): message is string[] => {
+  return Array.isArray(message);
+};
+
 export {
   isChanceNode,
   isChanceToChanceEdge,
@@ -42,5 +46,6 @@ export {
   isDecisionEdge,
   isDecisionNode,
   isEndpointNode,
+  isStringArray,
   isTextNode,
 };
