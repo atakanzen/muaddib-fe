@@ -57,7 +57,7 @@ const DecisionEdge = ({
       <EdgeLabelRenderer>
         {!isHighlighted && (
           <span
-            className="text-black font-bold text-2xl"
+            className="text-black font-bold text-xl"
             style={{
               position: "absolute",
               transform: `translate(-120%, -60%) translate(${centerX}px, ${centerY}px)`,
