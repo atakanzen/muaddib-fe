@@ -8,6 +8,7 @@ import {
 import { MouseEvent, useCallback, useMemo, useRef } from "react";
 
 import ContextMenu from "../components/shared/contextMenu";
+import ExportImageButton from "../components/shared/exportImageButton";
 import { customEdgeTypes } from "../constants/customEdgeTypes";
 import { customNodeTypes } from "../constants/customNodeTypes";
 import {
@@ -78,7 +79,9 @@ function Editor() {
         size={1}
       />
       <MiniMap />
-      <Controls />
+      <Controls>
+        <ExportImageButton />
+      </Controls>
     </ReactFlow>
   );
 }
