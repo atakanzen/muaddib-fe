@@ -37,7 +37,7 @@ const ChanceToChanceEdge = ({
     targetY,
   });
 
-  const centerX = (sourceX + targetX) / 3;
+  const centerX = Math.max((sourceX + targetX) / 3, sourceX);
   const centerY = (sourceY + targetY) / 2;
 
   return (

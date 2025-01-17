@@ -66,7 +66,7 @@ const sensorDemo: EditorState = {
         y: 20,
       },
       data: {
-        calculatedPayoff: 70_000,
+        calculatedPayoff: 390_000,
       },
     },
     {
@@ -159,7 +159,7 @@ const sensorDemo: EditorState = {
       data: {
         probability: 80,
         isSetByUser: false,
-        payoff: 80_000,
+        payoff: 400_000,
         payoffType: "profit",
       },
     },

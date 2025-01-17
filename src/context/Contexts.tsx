@@ -14,11 +14,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
     const token = sessionStorage.getItem("authToken");
     setIsAuthenticated(!!token);
+    setAuthChecked(true);
   }, []);
+
+  if (!authChecked) {
+    return null; // Prevent rendering children until auth is checked.
+  }
 
   const login = (token: string) => {
     sessionStorage.setItem("authToken", token);
