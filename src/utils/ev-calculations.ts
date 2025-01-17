@@ -1,6 +1,7 @@
 import { Edge, Node } from "@xyflow/react";
 import { TChanceToChanceEdge } from "../edges/chance-to-chance-edge";
 import { TChanceToEndpointEdge } from "../edges/chance-to-endpoint-edge";
+import { TDecisionEdge } from "../edges/decision-edge";
 import { TEndpointNode } from "../nodes/endpoint-node";
 import { EditorState } from "../state/editor/store";
 import {
@@ -68,6 +69,56 @@ function handleEdgeChange(
   } else if (isChanceToChanceEdge(edge) || isChanceToEndpointEdge(edge)) {
     recalculateFromNode(edge.source, state, new Set(), isFaultyProbability);
   }
+
+  highlightOptimalPath(state);
+}
+
+function highlightOptimalPath(state: EditorState) {
+  // Clear previous highlights
+  state.edges.filter(isDecisionEdge).forEach((edge) => {
+    edge.data.isHighlighted = false;
+  });
+
+  // Find all decision nodes (intermediary or root)
+  const allDecisionNodes = state.nodes.filter(isDecisionNode);
+
+  allDecisionNodes.forEach((decisionNode) => {
+    // Find edges connected to the current decision node
+    const connectedEdges = state.edges.filter(
+      (e) => e.source === decisionNode.id
+    ) as TDecisionEdge[];
+
+    let maxVal = Number.NEGATIVE_INFINITY;
+    let optimalEdgeID = "";
+
+    connectedEdges.forEach((edge) => {
+      const targetNode = state.nodes.find((n) => n.id === edge.target);
+      if (!targetNode) {
+        return;
+      }
+
+      // Determine the value to compare (EV for chance/decision nodes, payoff for endpoint nodes)
+      const value =
+        isChanceNode(targetNode) || isDecisionNode(targetNode)
+          ? targetNode.data.ev ?? 0
+          : isEndpointNode(targetNode)
+          ? targetNode.data.calculatedPayoff ?? 0
+          : 0;
+
+      if (value > maxVal) {
+        maxVal = value;
+        optimalEdgeID = edge.id;
+      }
+    });
+
+    // Highlight the optimal edge if found
+    const optimalEdge = state.edges.find(
+      (e) => e.id === optimalEdgeID
+    ) as TDecisionEdge;
+    if (optimalEdge) {
+      optimalEdge.data.isHighlighted = true;
+    }
+  });
 }
 
 function recalculateFromNode(

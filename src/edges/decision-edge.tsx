@@ -5,6 +5,7 @@ import {
   EdgeProps,
   getSimpleBezierPath,
 } from "@xyflow/react";
+import classNames from "classnames";
 import {
   PayoffInput,
   PayoffType,
@@ -14,6 +15,7 @@ import { changePayoffInputForDecisionEdge } from "../state/editor/store";
 type DecisionEdgeData = {
   payoff: number;
   payoffType?: PayoffType;
+  isHighlighted: boolean;
 };
 
 export type TDecisionEdge = Omit<
@@ -29,7 +31,8 @@ const DecisionEdge = ({
   sourceY,
   targetX,
   targetY,
-  data: { payoff, payoffType },
+  selected,
+  data: { payoff, payoffType, isHighlighted },
 }: EdgeProps<TDecisionEdge>) => {
   const [edgePath] = getSimpleBezierPath({
     sourceX,
@@ -38,10 +41,31 @@ const DecisionEdge = ({
     targetY,
   });
 
+  const centerX = Math.max((sourceX + targetX) / 2, sourceX);
+  const centerY = (sourceY + targetY) / 2;
+
   return (
     <>
-      <BaseEdge id={id} path={edgePath} />
+      <BaseEdge
+        id={id}
+        path={edgePath}
+        className={classNames({
+          "stroke-green-500 stroke-2": isHighlighted,
+          "!stroke-green-700 stroke-2": isHighlighted && selected,
+        })}
+      />
       <EdgeLabelRenderer>
+        {!isHighlighted && (
+          <span
+            className="text-black font-bold text-2xl"
+            style={{
+              position: "absolute",
+              transform: `translate(-120%, -60%) translate(${centerX}px, ${centerY}px)`,
+            }}
+          >
+            //
+          </span>
+        )}
         <PayoffInput
           id={id}
           payoff={payoff}

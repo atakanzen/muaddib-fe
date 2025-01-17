@@ -44,7 +44,7 @@ const ChanceToEndpointEdge = ({
     targetY,
   });
 
-  const centerX = (sourceX + targetX) / 3;
+  const centerX = Math.max((sourceX + targetX) / 3, sourceX);
   const centerY = (sourceY + targetY) / 2;
 
   return (
@@ -61,9 +61,7 @@ const ChanceToEndpointEdge = ({
         <div
           className="absolute"
           style={{
-            transform: `translate(-50%, -50%) translate(${centerX}px, ${
-              centerY - 15
-            }px)`,
+            transform: `translate(${centerX}px, ${centerY - 15}px)`,
           }}
         >
           <ChanceProbabilityInput edgeID={id} />
