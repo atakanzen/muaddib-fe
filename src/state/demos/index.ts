@@ -102,6 +102,7 @@ const sensorDemo: EditorState = {
       data: {
         payoff: -100_000,
         payoffType: "cost",
+        isHighlighted: true,
       },
     },
     {
