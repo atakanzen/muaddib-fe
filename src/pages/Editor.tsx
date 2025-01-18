@@ -3,12 +3,14 @@ import {
   BackgroundVariant,
   Controls,
   MiniMap,
+  Panel,
   ReactFlow,
 } from "@xyflow/react";
 import { MouseEvent, useCallback, useMemo, useRef } from "react";
 
+import ExportButton from "@/components/shared/export-button";
+import SaveButton from "@/components/shared/save-button";
 import ContextMenu from "../components/shared/contextMenu";
-import ExportImageButton from "../components/shared/exportImageButton";
 import { customEdgeTypes } from "../constants/customEdgeTypes";
 import { customNodeTypes } from "../constants/customNodeTypes";
 import {
@@ -79,9 +81,11 @@ function Editor() {
         size={1}
       />
       <MiniMap />
-      <Controls>
-        <ExportImageButton />
-      </Controls>
+      <Panel className="absolute !top-20 flex items-center justify-center gap-2">
+        <SaveButton />
+        <ExportButton />
+      </Panel>
+      <Controls />
     </ReactFlow>
   );
 }

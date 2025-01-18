@@ -8,6 +8,7 @@ import {
   EdgeChange,
   Node,
   NodeChange,
+  Viewport,
 } from "@xyflow/react";
 import { TChanceToChanceEdge } from "../../edges/chance-to-chance-edge";
 import { TChanceToEndpointEdge } from "../../edges/chance-to-endpoint-edge";
@@ -34,6 +35,7 @@ import { RootState } from "../store";
 export interface EditorState {
   nodes: Node[];
   edges: Edge[];
+  viewport: Viewport;
   paneContextMenu: {
     visible: boolean;
     position: { x: number; y: number };

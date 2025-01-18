@@ -4,6 +4,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router";
+import { Toaster } from "./components/ui/sonner.tsx";
 import { AuthProvider } from "./context/Contexts.tsx";
 import "./index.css";
 import About from "./pages/About.tsx";
@@ -29,6 +30,16 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 <Route path="*" Component={NotFound} />
               </Route>
             </Routes>
+            <Toaster
+              toastOptions={{
+                unstyled: true,
+                classNames: {
+                  toast:
+                    "text-base flex items-center justify-center gap-4 p-4 bg-white rounded-md border w-96",
+                },
+              }}
+              position="bottom-center"
+            />
           </ReactFlowProvider>
         </Provider>
       </AuthProvider>
