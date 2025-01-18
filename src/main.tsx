@@ -25,7 +25,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="/auth" Component={Auth} />
               <Route element={<Layout />}>
                 <Route path="/" Component={Home} />
-                <Route path="/editor" Component={Editor} />
+                <Route path="/editor/:treeID" Component={Editor} />
                 <Route path="/about-us" Component={About} />
                 <Route path="*" Component={NotFound} />
               </Route>

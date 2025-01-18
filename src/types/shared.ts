@@ -1,4 +1,4 @@
-import { Edge, Node, Viewport } from "@xyflow/react";
+import { ReactFlowJsonObject } from "@xyflow/react";
 
 type ErrorResponse = {
   message: string[] | string;
@@ -6,10 +6,7 @@ type ErrorResponse = {
   statusCode: number;
 };
 
-type EditorLocalState = {
-  nodes: Node[];
-  edges: Edge[];
-  viewport: Viewport;
+type EditorLocalState = ReactFlowJsonObject & {
   paneContextMenu: {
     visible: boolean;
     position: { x: number; y: number };

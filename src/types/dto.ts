@@ -1,3 +1,5 @@
+import { ReactFlowJsonObject } from "@xyflow/react";
+
 type DecisionTreeInformative = {
   id: string;
   name: string;
@@ -7,4 +9,17 @@ type DecisionTreeInformative = {
 
 type DecisionTreeListResponse = DecisionTreeInformative[];
 
-export type { DecisionTreeListResponse };
+type DecisionTreeResponse = Omit<DecisionTreeInformative, "id"> & {
+  tree: ReactFlowJsonObject;
+};
+
+type UpdateDecisionTreeRequest = {
+  name?: string;
+  tree?: ReactFlowJsonObject;
+};
+
+export type {
+  DecisionTreeListResponse,
+  DecisionTreeResponse,
+  UpdateDecisionTreeRequest,
+};

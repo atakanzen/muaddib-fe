@@ -38,6 +38,12 @@ export const editorSlice = createSlice({
   name: "editor",
   initialState,
   reducers: {
+    setNodes: (state, action: PayloadAction<Node[]>) => {
+      state.nodes = action.payload;
+    },
+    setEdges: (state, action: PayloadAction<Edge[]>) => {
+      state.edges = action.payload;
+    },
     onNodesChange: (state, action: PayloadAction<NodeChange[]>) => {
       state.nodes = applyNodeChanges(action.payload, state.nodes);
     },
@@ -345,8 +351,11 @@ export const {
   changePayoffInputForDecisionEdge,
   changePayoffInputForChanceEdge,
   changeInputForTextNode,
+  setNodes,
+  setEdges,
 } = editorSlice.actions;
 
+export const selectEditorState = (state: RootState) => state.editor;
 export const selectNodes = (state: RootState) => state.editor.nodes;
 export const selectEdges = (state: RootState) => state.editor.edges;
 export const selectEdgeByID = <T = Edge>(state: RootState, edgeID: string) =>
