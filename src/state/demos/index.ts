@@ -1,6 +1,6 @@
-import { EditorState } from "../editor/store";
+import { EditorLocalState } from "@/types/shared";
 
-const sensorDemo: EditorState = {
+const sensorDemo: EditorLocalState = {
   nodes: [
     {
       id: "1",

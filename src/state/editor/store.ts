@@ -1,3 +1,4 @@
+import { EditorLocalState } from "@/types/shared";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   addEdge,
@@ -8,7 +9,6 @@ import {
   EdgeChange,
   Node,
   NodeChange,
-  Viewport,
 } from "@xyflow/react";
 import { TChanceToChanceEdge } from "../../edges/chance-to-chance-edge";
 import { TChanceToEndpointEdge } from "../../edges/chance-to-endpoint-edge";
@@ -32,17 +32,7 @@ import {
 import { sensorDemo } from "../demos";
 import { RootState } from "../store";
 
-export interface EditorState {
-  nodes: Node[];
-  edges: Edge[];
-  viewport: Viewport;
-  paneContextMenu: {
-    visible: boolean;
-    position: { x: number; y: number };
-  };
-}
-
-const initialState: EditorState = sensorDemo;
+const initialState: EditorLocalState = sensorDemo;
 
 export const editorSlice = createSlice({
   name: "editor",
