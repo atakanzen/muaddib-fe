@@ -1,4 +1,4 @@
-import { CheckCheck } from "lucide-react";
+import { CheckCheckIcon, SaveIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 
@@ -6,11 +6,12 @@ const SaveButton = () => {
   const handleOnClickSave = () => {
     toast("Your progress has been saved.", {
       className: "text-base",
-      icon: <CheckCheck />,
+      icon: <CheckCheckIcon />,
     });
   };
   return (
-    <Button className="" onClick={handleOnClickSave} variant="default">
+    <Button onClick={handleOnClickSave} variant="default">
+      <SaveIcon />
       Save
     </Button>
   );

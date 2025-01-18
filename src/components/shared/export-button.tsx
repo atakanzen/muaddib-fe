@@ -4,7 +4,13 @@ import {
   useReactFlow,
 } from "@xyflow/react";
 import { toPng } from "html-to-image";
-import { CopyCheck, ImageDown } from "lucide-react";
+import {
+  BracesIcon,
+  CopyCheckIcon,
+  DownloadIcon,
+  ImageDownIcon,
+  ImageIcon,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import {
@@ -55,7 +61,7 @@ function ExportButton() {
       .then(downloadImage)
       .then(() =>
         toast("PNG export has been downloaded.", {
-          icon: <ImageDown />,
+          icon: <ImageDownIcon />,
         })
       );
   };
@@ -73,7 +79,7 @@ function ExportButton() {
       .then(() =>
         toast("JSON copied to clipboard!", {
           description: "You can now paste it somewhere for future use.",
-          icon: <CopyCheck />,
+          icon: <CopyCheckIcon />,
         })
       )
       .catch((err) => {
@@ -84,20 +90,23 @@ function ExportButton() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="default">Export</Button>
+        <Button variant="default">
+          <DownloadIcon /> Export
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem
-          className="cursor-pointer"
+          className="cursor-pointer flex justify-between"
           onClick={handleOnClickPNGExport}
         >
           PNG
+          <ImageIcon />
         </DropdownMenuItem>
         <DropdownMenuItem
-          className="cursor-pointer"
+          className="cursor-pointer  flex justify-between"
           onClick={handleOnClickJSONExport}
         >
-          JSON
+          JSON <BracesIcon />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
