@@ -11,10 +11,6 @@ const links = [
     title: "Home",
   },
   {
-    url: "/editor",
-    title: "Editor",
-  },
-  {
     url: "/about-us",
     title: "About Us",
   },

@@ -5,7 +5,6 @@ import {
   MiniMap,
   Panel,
   ReactFlow,
-  useReactFlow,
 } from "@xyflow/react";
 import { MouseEvent, useCallback, useEffect, useMemo } from "react";
 
@@ -23,17 +22,19 @@ import {
   onEdgesChange,
   onEdgesDelete,
   onNodesChange,
+  onViewportChange,
   selectEdges,
   selectNodes,
   selectPaneContextVisible,
+  selectViewport,
   setEdges,
   setNodes,
+  setViewport,
   showPaneContextMenu,
 } from "../state/editor/store";
 import { useAppDispatch, useAppSelector } from "../state/hooks";
 
 function Editor() {
-  const { setViewport } = useReactFlow();
   const { treeID } = useParams();
   const { data, isLoading, isError } = useGetDecisionTreeByIDQuery(
     treeID ?? ""
@@ -42,15 +43,15 @@ function Editor() {
 
   useEffect(() => {
     if (data) {
-      console.log("DATA", data);
       dispatch(setNodes(data.tree.nodes));
       dispatch(setEdges(data.tree.edges));
-      setViewport(data.tree.viewport); // Directly update ReactFlow viewport
+      dispatch(setViewport(data.tree.viewport));
     }
-  }, [data, dispatch, setViewport]);
+  }, [data, dispatch]);
 
   const nodes = useAppSelector(selectNodes);
   const edges = useAppSelector(selectEdges);
+  const viewport = useAppSelector(selectViewport);
 
   const paneContextMenuVisible = useAppSelector(selectPaneContextVisible);
 
@@ -82,6 +83,7 @@ function Editor() {
 
   return (
     <ReactFlow
+      viewport={viewport}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
       nodes={nodes}
@@ -89,6 +91,7 @@ function Editor() {
       onConnect={(conn) => dispatch(onConnect(conn))}
       onNodesChange={(ch) => dispatch(onNodesChange(ch))}
       onEdgesChange={(ch) => dispatch(onEdgesChange(ch))}
+      onViewportChange={(v) => dispatch(onViewportChange(v))}
       onEdgesDelete={(edges) => dispatch(onEdgesDelete(edges))}
       onPaneContextMenu={handleOnContextMenu}
       onPaneClick={onPaneClick}

@@ -7,17 +7,18 @@ import {
   LoaderCircleIcon,
   SaveIcon,
 } from "lucide-react";
+import { useCallback } from "react";
 import { useParams } from "react-router";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 
 const SaveButton = () => {
-  const [updateDecisionTree, { isLoading, isSuccess, isError }] =
+  const [updateDecisionTree, { isLoading }] =
     useUpdateDecisionTreeWithIDMutation();
   const editorState = useAppSelector(selectEditorState);
   const { treeID } = useParams();
 
-  const handleOnClickSave = async () => {
+  const handleOnClickSave = useCallback(async () => {
     await updateDecisionTree({
       patch: {
         tree: {
@@ -27,20 +28,20 @@ const SaveButton = () => {
         },
       },
       treeID: treeID ?? "",
-    });
+    })
+      .unwrap()
+      .then(() =>
+        toast("Your progress has been saved.", {
+          icon: <CheckCheckIcon />,
+        })
+      )
+      .catch(() =>
+        toast("Something went wrong.", {
+          icon: <CircleAlertIcon />,
+        })
+      );
+  }, [editorState]);
 
-    if (isSuccess) {
-      toast("Your progress has been saved.", {
-        icon: <CheckCheckIcon />,
-      });
-    }
-
-    if (isError) {
-      toast("Something went wrong.", {
-        icon: <CircleAlertIcon />,
-      });
-    }
-  };
   return (
     <Button onClick={handleOnClickSave} variant="default">
       {!isLoading ? (

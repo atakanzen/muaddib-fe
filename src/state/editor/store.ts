@@ -9,6 +9,7 @@ import {
   EdgeChange,
   Node,
   NodeChange,
+  Viewport,
 } from "@xyflow/react";
 import { TChanceToChanceEdge } from "../../edges/chance-to-chance-edge";
 import { TChanceToEndpointEdge } from "../../edges/chance-to-endpoint-edge";
@@ -43,6 +44,12 @@ export const editorSlice = createSlice({
     },
     setEdges: (state, action: PayloadAction<Edge[]>) => {
       state.edges = action.payload;
+    },
+    setViewport: (state, action: PayloadAction<Viewport>) => {
+      state.viewport = action.payload;
+    },
+    onViewportChange: (state, action: PayloadAction<Viewport>) => {
+      state.viewport = action.payload;
     },
     onNodesChange: (state, action: PayloadAction<NodeChange[]>) => {
       state.nodes = applyNodeChanges(action.payload, state.nodes);
@@ -340,6 +347,7 @@ export const editorSlice = createSlice({
 });
 
 export const {
+  onViewportChange,
   onConnect,
   onEdgesChange,
   onNodesChange,
@@ -351,11 +359,13 @@ export const {
   changePayoffInputForDecisionEdge,
   changePayoffInputForChanceEdge,
   changeInputForTextNode,
+  setViewport,
   setNodes,
   setEdges,
 } = editorSlice.actions;
 
 export const selectEditorState = (state: RootState) => state.editor;
+export const selectViewport = (state: RootState) => state.editor.viewport;
 export const selectNodes = (state: RootState) => state.editor.nodes;
 export const selectEdges = (state: RootState) => state.editor.edges;
 export const selectEdgeByID = <T = Edge>(state: RootState, edgeID: string) =>

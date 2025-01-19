@@ -16,7 +16,6 @@ import { useNavigate } from "react-router";
 const Home = () => {
   const { data, error } = useListDecisionTreesQuery();
   const navigate = useNavigate();
-  console.log(error);
 
   const handleClickEdit = (treeID: string) => {
     navigate(`editor/${treeID}`);

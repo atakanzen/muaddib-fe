@@ -14,6 +14,7 @@ const extendedDecisionTreeAPI = baseAPI.injectEndpoints({
       }),
       getDecisionTreeByID: builder.query<DecisionTreeResponse, string>({
         query: (treeID) => ({ url: `decision-tree/get/${treeID}` }),
+        providesTags: ["decisionTree"],
       }),
       updateDecisionTreeWithID: builder.mutation<
         void,
