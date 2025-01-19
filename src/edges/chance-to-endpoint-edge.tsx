@@ -37,15 +37,12 @@ const ChanceToEndpointEdge = ({
   selected,
   data: { payoff, payoffType: payOffType, isFaulty },
 }: EdgeProps<TChanceToEndpointEdge>) => {
-  const [edgePath] = getSimpleBezierPath({
+  const [edgePath, labelX, labelY] = getSimpleBezierPath({
     sourceX,
     sourceY,
     targetX,
     targetY,
   });
-
-  const centerX = Math.max((sourceX + targetX) / 3, sourceX);
-  const centerY = (sourceY + targetY) / 2;
 
   return (
     <>
@@ -61,7 +58,7 @@ const ChanceToEndpointEdge = ({
         <div
           className="absolute"
           style={{
-            transform: `translate(${centerX}px, ${centerY - 15}px)`,
+            transform: `translate(${labelX}px, ${labelY - 15}px)`,
           }}
         >
           <ChanceProbabilityInput edgeID={id} />

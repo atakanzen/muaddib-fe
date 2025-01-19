@@ -1,3 +1,4 @@
+import { EditorLocalState } from "@/types/shared";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   addEdge,
@@ -8,6 +9,7 @@ import {
   EdgeChange,
   Node,
   NodeChange,
+  Viewport,
 } from "@xyflow/react";
 import { TChanceToChanceEdge } from "../../edges/chance-to-chance-edge";
 import { TChanceToEndpointEdge } from "../../edges/chance-to-endpoint-edge";
@@ -31,21 +33,24 @@ import {
 import { sensorDemo } from "../demos";
 import { RootState } from "../store";
 
-export interface EditorState {
-  nodes: Node[];
-  edges: Edge[];
-  paneContextMenu: {
-    visible: boolean;
-    position: { x: number; y: number };
-  };
-}
-
-const initialState: EditorState = sensorDemo;
+const initialState: EditorLocalState = sensorDemo;
 
 export const editorSlice = createSlice({
   name: "editor",
   initialState,
   reducers: {
+    setNodes: (state, action: PayloadAction<Node[]>) => {
+      state.nodes = action.payload;
+    },
+    setEdges: (state, action: PayloadAction<Edge[]>) => {
+      state.edges = action.payload;
+    },
+    setViewport: (state, action: PayloadAction<Viewport>) => {
+      state.viewport = action.payload;
+    },
+    onViewportChange: (state, action: PayloadAction<Viewport>) => {
+      state.viewport = action.payload;
+    },
     onNodesChange: (state, action: PayloadAction<NodeChange[]>) => {
       state.nodes = applyNodeChanges(action.payload, state.nodes);
     },
@@ -342,6 +347,7 @@ export const editorSlice = createSlice({
 });
 
 export const {
+  onViewportChange,
   onConnect,
   onEdgesChange,
   onNodesChange,
@@ -353,8 +359,13 @@ export const {
   changePayoffInputForDecisionEdge,
   changePayoffInputForChanceEdge,
   changeInputForTextNode,
+  setViewport,
+  setNodes,
+  setEdges,
 } = editorSlice.actions;
 
+export const selectEditorState = (state: RootState) => state.editor;
+export const selectViewport = (state: RootState) => state.editor.viewport;
 export const selectNodes = (state: RootState) => state.editor.nodes;
 export const selectEdges = (state: RootState) => state.editor.edges;
 export const selectEdgeByID = <T = Edge>(state: RootState, edgeID: string) =>

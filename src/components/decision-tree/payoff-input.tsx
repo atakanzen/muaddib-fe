@@ -23,21 +23,30 @@ export const PayoffInput = ({
   const dispatch = useAppDispatch();
 
   const [inputValue, setInputValue] = useState(
-    Intl.NumberFormat("en-US").format(payoff)
+    Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(payoff)
   );
 
   const handleOnChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       const rawValue = e.target.value;
 
-      // Remove formatting (commas) and handle empty inputs
-      const numericValue = Number(rawValue.replace(/,/g, ""));
-      if (!isNaN(numericValue) || rawValue === "") {
+      // Remove invalid characters but keep valid input patterns
+      const sanitizedValue = rawValue
+        .replace(/[^0-9.,-]/g, "") // Allow numbers, commas, periods, and "-"
+        .replace(/(?!^)-/g, "") // Allow a single "-" at the start
+        .replace(/,/g, ""); // Temporarily strip commas to avoid conflicts
+
+      // Dispatch the numeric value if valid
+      const numericValue = Number(sanitizedValue);
+      if (
+        !isNaN(numericValue) ||
+        sanitizedValue === "-" ||
+        sanitizedValue === ""
+      ) {
         setInputValue(rawValue);
 
-        // Dispatch only valid numbers
-        if (rawValue !== "") {
-          dispatch(action({ id: id, value: numericValue }));
+        if (sanitizedValue !== "-" && sanitizedValue !== "") {
+          dispatch(action({ id, value: numericValue }));
         }
       }
     },
@@ -45,9 +54,16 @@ export const PayoffInput = ({
   );
 
   const handleOnBlur = useCallback(() => {
-    const numericValue = Number(inputValue.replace(/,/g, ""));
+    const sanitizedValue = inputValue.replace(/,/g, ""); // Remove commas for parsing
+    const numericValue = Number(sanitizedValue);
+
     if (!isNaN(numericValue)) {
-      setInputValue(Intl.NumberFormat("en-US").format(numericValue));
+      // Format with US number formatting
+      const formattedValue = Intl.NumberFormat("en-US", {
+        maximumFractionDigits: 2,
+      }).format(numericValue);
+
+      setInputValue(formattedValue);
     }
   }, [inputValue]);
 

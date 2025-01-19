@@ -1,9 +1,9 @@
+import { EditorLocalState } from "@/types/shared";
 import { Edge, Node } from "@xyflow/react";
 import { TChanceToChanceEdge } from "../edges/chance-to-chance-edge";
 import { TChanceToEndpointEdge } from "../edges/chance-to-endpoint-edge";
 import { TDecisionEdge } from "../edges/decision-edge";
 import { TEndpointNode } from "../nodes/endpoint-node";
-import { EditorState } from "../state/editor/store";
 import {
   isChanceNode,
   isChanceToChanceEdge,
@@ -55,7 +55,7 @@ const findConnectedEndpoints = (
 
 function handleEdgeChange(
   edgeID: string,
-  state: EditorState,
+  state: EditorLocalState,
   isFaultyProbability?: boolean
 ) {
   const edge = state.edges.find((e) => e.id === edgeID);
@@ -73,7 +73,7 @@ function handleEdgeChange(
   highlightOptimalPath(state);
 }
 
-function highlightOptimalPath(state: EditorState) {
+function highlightOptimalPath(state: EditorLocalState) {
   // Clear previous highlights
   state.edges.filter(isDecisionEdge).forEach((edge) => {
     edge.data.isHighlighted = false;
@@ -123,7 +123,7 @@ function highlightOptimalPath(state: EditorState) {
 
 function recalculateFromNode(
   nodeID: string,
-  state: EditorState,
+  state: EditorLocalState,
   visited: Set<string>,
   isFaultyProbability?: boolean
 ) {
@@ -159,7 +159,10 @@ function recalculateFromNode(
   );
 }
 
-function calculateEVForChanceNode(nodeID: string, state: EditorState): number {
+function calculateEVForChanceNode(
+  nodeID: string,
+  state: EditorLocalState
+): number {
   const outgoingEdges = state.edges.filter((e) => e.source === nodeID) as (
     | TChanceToEndpointEdge
     | TChanceToChanceEdge
@@ -181,7 +184,7 @@ function calculateEVForChanceNode(nodeID: string, state: EditorState): number {
 
 function calculateEVForDecisionNode(
   nodeID: string,
-  state: EditorState
+  state: EditorLocalState
 ): number {
   const outgoingEdges = state.edges.filter((e) => e.source === nodeID);
   return outgoingEdges.reduce((maxEV, edge) => {

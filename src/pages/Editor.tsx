@@ -3,12 +3,18 @@ import {
   BackgroundVariant,
   Controls,
   MiniMap,
+  Panel,
   ReactFlow,
 } from "@xyflow/react";
-import { MouseEvent, useCallback, useMemo, useRef } from "react";
+import { MouseEvent, useCallback, useEffect, useMemo } from "react";
 
+import { useGetDecisionTreeByIDQuery } from "@/api/decision-tree";
+import ExportButton from "@/components/shared/export-button";
+import ImportButton from "@/components/shared/import-button";
+import SaveButton from "@/components/shared/save-button";
+import { LoaderCircleIcon } from "lucide-react";
+import { useParams } from "react-router";
 import ContextMenu from "../components/shared/contextMenu";
-import ExportImageButton from "../components/shared/exportImageButton";
 import { customEdgeTypes } from "../constants/customEdgeTypes";
 import { customNodeTypes } from "../constants/customNodeTypes";
 import {
@@ -17,19 +23,37 @@ import {
   onEdgesChange,
   onEdgesDelete,
   onNodesChange,
+  onViewportChange,
   selectEdges,
   selectNodes,
   selectPaneContextVisible,
+  selectViewport,
+  setEdges,
+  setNodes,
+  setViewport,
   showPaneContextMenu,
 } from "../state/editor/store";
 import { useAppDispatch, useAppSelector } from "../state/hooks";
 
 function Editor() {
-  const rfRef = useRef<HTMLDivElement | null>(null);
-  // const instance = useReactFlow();
+  const { treeID } = useParams();
+  const { data, isLoading, isError } = useGetDecisionTreeByIDQuery(
+    treeID ?? ""
+  );
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (data) {
+      dispatch(setNodes(data.tree.nodes));
+      dispatch(setEdges(data.tree.edges));
+      dispatch(setViewport(data.tree.viewport));
+    }
+  }, [data, dispatch]);
+
   const nodes = useAppSelector(selectNodes);
   const edges = useAppSelector(selectEdges);
-  const dispatch = useAppDispatch();
+  const viewport = useAppSelector(selectViewport);
+
   const paneContextMenuVisible = useAppSelector(selectPaneContextVisible);
 
   const nodeTypes = useMemo(() => customNodeTypes, []);
@@ -55,9 +79,12 @@ function Editor() {
     [dispatch]
   );
 
+  if (isError) return <div>Error Occurred</div>;
+  if (isLoading) return <LoaderCircleIcon className="animate-spin" />;
+
   return (
     <ReactFlow
-      ref={rfRef}
+      viewport={viewport}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
       nodes={nodes}
@@ -65,11 +92,11 @@ function Editor() {
       onConnect={(conn) => dispatch(onConnect(conn))}
       onNodesChange={(ch) => dispatch(onNodesChange(ch))}
       onEdgesChange={(ch) => dispatch(onEdgesChange(ch))}
+      onViewportChange={(v) => dispatch(onViewportChange(v))}
       onEdgesDelete={(edges) => dispatch(onEdgesDelete(edges))}
       onPaneContextMenu={handleOnContextMenu}
       onPaneClick={onPaneClick}
       proOptions={{ hideAttribution: true }}
-      fitView
     >
       {paneContextMenuVisible && <ContextMenu />}
       <Background
@@ -79,9 +106,12 @@ function Editor() {
         size={1}
       />
       <MiniMap />
-      <Controls>
-        <ExportImageButton />
-      </Controls>
+      <Panel className="absolute !top-20 flex items-center justify-center gap-2">
+        <SaveButton />
+        <ExportButton />
+        <ImportButton />
+      </Panel>
+      <Controls />
     </ReactFlow>
   );
 }
