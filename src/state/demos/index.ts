@@ -1,6 +1,6 @@
-import { EditorState } from "../editor/store";
+import { EditorLocalState } from "@/types/shared";
 
-const sensorDemo: EditorState = {
+const sensorDemo: EditorLocalState = {
   nodes: [
     {
       id: "1",
@@ -177,6 +177,11 @@ const sensorDemo: EditorState = {
       },
     },
   ],
+  viewport: {
+    x: 0,
+    y: 0,
+    zoom: 1,
+  },
   paneContextMenu: {
     position: { x: 0, y: 0 },
     visible: false,

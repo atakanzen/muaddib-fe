@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   ChangeEventHandler,
   FormEventHandler,
@@ -108,13 +109,17 @@ const Auth = () => {
               />
             </div>
           )}
-          <button
+          <Button
             type="submit"
-            className="w-full bg-amber-600 text-white py-2 rounded-md shadow hover:bg-amber-700 transition"
+            className="w-full"
+            variant="default"
             disabled={isPending}
+            size="lg"
           >
+            {" "}
             {isLogin ? "Login" : "Sign Up"}
-          </button>
+          </Button>
+
           {error && <p className="text-red-500 text-center">{error}</p>}
         </form>
         <p className="text-center text-sm text-gray-600 mt-4">

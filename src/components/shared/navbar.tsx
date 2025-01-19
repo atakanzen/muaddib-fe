@@ -3,15 +3,12 @@ import { jwtDecode } from "jwt-decode";
 import { MouseEventHandler, useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { useAuth } from "../../hooks/useAuth";
+import { Button } from "../ui/button";
 
 const links = [
   {
     url: "/",
     title: "Home",
-  },
-  {
-    url: "/editor",
-    title: "Editor",
   },
   {
     url: "/about-us",
@@ -49,7 +46,7 @@ const Navbar = () => {
   const userInitial = username ? username.charAt(0).toUpperCase() : "";
 
   return (
-    <div className="absolute z-50 top-0 left-0 w-full h-20 bg-slate-50 border-b-4 border-black flex items-center justify-between p-4">
+    <div className="absolute z-50 top-0 left-0 w-full h-20 bg-white border-b-4 border-black flex items-center justify-between p-4">
       <div className="flex items-center justify-center gap-2">
         <h1 className="font-serif font-extrabold text-2xl ">Muad'dib</h1>
         <p className="text-gray-400">subject to change</p>
@@ -73,12 +70,9 @@ const Navbar = () => {
         </nav>
       </div>
       <div className="flex items-center gap-4">
-        <button
-          className="bg-amber-500 border border-black rounded cursor-pointer px-4 py-2"
-          onClick={handleSignOut}
-        >
+        <Button variant="outline" onClick={handleSignOut}>
           Sign Out
-        </button>
+        </Button>
         {username && (
           <div
             className="relative group"
