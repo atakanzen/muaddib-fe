@@ -7,9 +7,9 @@ import { toPng } from "html-to-image";
 import {
   BracesIcon,
   CopyCheckIcon,
-  DownloadIcon,
   ImageDownIcon,
   ImageIcon,
+  UploadIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
@@ -91,7 +91,7 @@ function ExportButton() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="default">
-          <DownloadIcon /> Export
+          <UploadIcon /> Export
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>

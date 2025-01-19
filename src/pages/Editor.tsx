@@ -10,6 +10,7 @@ import { MouseEvent, useCallback, useEffect, useMemo } from "react";
 
 import { useGetDecisionTreeByIDQuery } from "@/api/decision-tree";
 import ExportButton from "@/components/shared/export-button";
+import ImportButton from "@/components/shared/import-button";
 import SaveButton from "@/components/shared/save-button";
 import { LoaderCircleIcon } from "lucide-react";
 import { useParams } from "react-router";
@@ -96,7 +97,6 @@ function Editor() {
       onPaneContextMenu={handleOnContextMenu}
       onPaneClick={onPaneClick}
       proOptions={{ hideAttribution: true }}
-      fitView
     >
       {paneContextMenuVisible && <ContextMenu />}
       <Background
@@ -109,6 +109,7 @@ function Editor() {
       <Panel className="absolute !top-20 flex items-center justify-center gap-2">
         <SaveButton />
         <ExportButton />
+        <ImportButton />
       </Panel>
       <Controls />
     </ReactFlow>

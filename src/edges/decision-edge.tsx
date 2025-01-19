@@ -34,15 +34,12 @@ const DecisionEdge = ({
   selected,
   data: { payoff, payoffType, isHighlighted },
 }: EdgeProps<TDecisionEdge>) => {
-  const [edgePath] = getSimpleBezierPath({
+  const [edgePath, labelX, labelY] = getSimpleBezierPath({
     sourceX,
     sourceY,
     targetX,
     targetY,
   });
-
-  const centerX = Math.max((sourceX + targetX) / 2, sourceX);
-  const centerY = (sourceY + targetY) / 2;
 
   return (
     <>
@@ -60,7 +57,7 @@ const DecisionEdge = ({
             className="text-black font-bold text-xl"
             style={{
               position: "absolute",
-              transform: `translate(-120%, -60%) translate(${centerX}px, ${centerY}px)`,
+              transform: `translate(${labelX}px, ${labelY - 15}px)`,
             }}
           >
             //
