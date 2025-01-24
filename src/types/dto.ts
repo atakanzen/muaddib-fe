@@ -18,7 +18,13 @@ type UpdateDecisionTreeRequest = {
   tree?: ReactFlowJsonObject;
 };
 
+type CreateDecisionTreeRequest = {
+  name: string;
+  tree: ReactFlowJsonObject;
+};
+
 export type {
+  CreateDecisionTreeRequest,
   DecisionTreeListResponse,
   DecisionTreeResponse,
   UpdateDecisionTreeRequest,

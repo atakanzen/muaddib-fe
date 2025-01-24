@@ -1,4 +1,5 @@
 import {
+  CreateDecisionTreeRequest,
   DecisionTreeListResponse,
   DecisionTreeResponse,
   UpdateDecisionTreeRequest,
@@ -16,6 +17,17 @@ const extendedDecisionTreeAPI = baseAPI.injectEndpoints({
         query: (treeID) => ({ url: `decision-tree/get/${treeID}` }),
         providesTags: ["decisionTree"],
       }),
+      createDecisionTree: builder.mutation<
+        { id: string },
+        CreateDecisionTreeRequest
+      >({
+        query: (requestBody) => ({
+          url: `decision-tree/create`,
+          method: "POST",
+          body: requestBody,
+        }),
+        invalidatesTags: ["decisionTree"],
+      }),
       updateDecisionTreeWithID: builder.mutation<
         void,
         { patch: UpdateDecisionTreeRequest; treeID: string }
@@ -27,6 +39,13 @@ const extendedDecisionTreeAPI = baseAPI.injectEndpoints({
         }),
         invalidatesTags: ["decisionTree"],
       }),
+      deleteDecisionTreeWithID: builder.mutation<void, { treeID: string }>({
+        query: ({ treeID }) => ({
+          url: `decision-tree/delete/${treeID}`,
+          method: "DELETE",
+        }),
+        invalidatesTags: ["decisionTree"],
+      }),
     };
   },
 });
@@ -35,4 +54,6 @@ export const {
   useListDecisionTreesQuery,
   useGetDecisionTreeByIDQuery,
   useUpdateDecisionTreeWithIDMutation,
+  useCreateDecisionTreeMutation,
+  useDeleteDecisionTreeWithIDMutation,
 } = extendedDecisionTreeAPI;
