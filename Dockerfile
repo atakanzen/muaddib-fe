@@ -19,9 +19,6 @@ RUN npm run build
 # Install PM2 globally
 RUN npm install -g pm2
 
-
-ENV VITE_BACKEND_URL=https://muaddib-be-72554550959.europe-central2.run.app
-
 # Expose the port for the app
 EXPOSE 8080
 
