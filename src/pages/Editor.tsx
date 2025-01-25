@@ -12,7 +12,8 @@ import { useGetDecisionTreeByIDQuery } from "@/api/decision-tree";
 import ExportButton from "@/components/shared/export-button";
 import ImportButton from "@/components/shared/import-button";
 import SaveButton from "@/components/shared/save-button";
-import { LoaderCircleIcon } from "lucide-react";
+import { getErrorMessage } from "@/utils/error";
+import { FileLockIcon, LoaderCircleIcon } from "lucide-react";
 import { useParams } from "react-router";
 import ContextMenu from "../components/shared/contextMenu";
 import { customEdgeTypes } from "../constants/customEdgeTypes";
@@ -37,7 +38,7 @@ import { useAppDispatch, useAppSelector } from "../state/hooks";
 
 function Editor() {
   const { treeID } = useParams();
-  const { data, isLoading, isError } = useGetDecisionTreeByIDQuery(
+  const { data, isLoading, isError, error } = useGetDecisionTreeByIDQuery(
     treeID ?? ""
   );
   const dispatch = useAppDispatch();
@@ -79,8 +80,23 @@ function Editor() {
     [dispatch]
   );
 
-  if (isError) return <div>Error Occurred</div>;
-  if (isLoading) return <LoaderCircleIcon className="animate-spin" />;
+  if (isError) {
+    const { message, status } = getErrorMessage(error);
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center  gap-2">
+        {status === 401 && <FileLockIcon className="w-12 h-12" />}
+        <p className="text-2xl">{message}</p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex w-full h-full items-center justify-center">
+        <LoaderCircleIcon className="animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <ReactFlow

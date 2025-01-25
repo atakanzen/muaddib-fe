@@ -16,7 +16,15 @@ export const DecisionNode = ({
   return (
     <div data-isroot={isRoot} className="relative">
       {ev !== undefined && (
-        <span className="absolute right-full top-1/2 -translate-y-1/2 mr-2 nodrag hover:cursor-default select-text border border-slate-600 p-1 bg-slate-500 rounded font-semibold text-white text-xss w-22 truncate">
+        <span
+          className={classNames(
+            "absolute nodrag hover:cursor-default select-text border border-slate-600 p-1 bg-slate-500 rounded font-semibold text-white text-xss w-22 truncate",
+            {
+              "left-1/2 top-full -translate-x-2/4 mt-2": !isRoot,
+              "right-full top-1/2 -translate-y-1/2 mr-2": isRoot,
+            }
+          )}
+        >
           EV: ${Intl.NumberFormat("en-US").format(ev)}
         </span>
       )}

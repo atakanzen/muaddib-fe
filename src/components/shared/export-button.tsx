@@ -6,6 +6,7 @@ import {
 import { toPng } from "html-to-image";
 import {
   BracesIcon,
+  CircleAlertIcon,
   CopyCheckIcon,
   ImageDownIcon,
   ImageIcon,
@@ -84,6 +85,9 @@ function ExportButton() {
       )
       .catch((err) => {
         console.error("Failed to copy JSON to clipboard:", err);
+        toast("Something went wrong", {
+          icon: <CircleAlertIcon />,
+        });
       });
   };
 

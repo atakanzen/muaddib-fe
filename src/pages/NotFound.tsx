@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
 
 const NotFound = () => {
@@ -7,9 +8,9 @@ const NotFound = () => {
       <p className="text-xl">
         Sorry, the page you are looking for could not be found.
       </p>
-      <Link className="px-4 py-2 bg-amber-500 rounded cursor-pointer" to="/">
-        Take me Home
-      </Link>
+      <Button>
+        <Link to="/">Take Me Home</Link>
+      </Button>
     </div>
   );
 };

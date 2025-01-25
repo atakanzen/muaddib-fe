@@ -14,13 +14,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { EditIcon, Trash2Icon } from "lucide-react";
+import { getFormattedDate } from "@/utils/date";
+import { AlertCircleIcon, EditIcon, Trash2Icon } from "lucide-react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
 const Home = () => {
   const { data, error } = useListDecisionTreesQuery();
-  const [deleteTree] = useDeleteDecisionTreeWithIDMutation();
+  const [deleteTree, { isLoading: isDeleteLoading }] =
+    useDeleteDecisionTreeWithIDMutation();
   const navigate = useNavigate();
 
   const handleClickEdit = (treeID: string) => {
@@ -30,7 +32,12 @@ const Home = () => {
   const handleClickDelete = (treeID: string) => {
     deleteTree({ treeID })
       .unwrap()
-      .then(() => toast("Tree successfully deleted."));
+      .then(() => toast("Tree successfully deleted."))
+      .catch(() =>
+        toast("Something went wrong while deleting your tree.", {
+          icon: <AlertCircleIcon />,
+        })
+      );
   };
 
   return (
@@ -59,7 +66,9 @@ const Home = () => {
                 {decisionTree.id}
               </TableCell>
               <TableCell colSpan={3}>{decisionTree.name}</TableCell>
-              <TableCell colSpan={3}>{decisionTree.createdAt}</TableCell>
+              <TableCell colSpan={3}>
+                {getFormattedDate(decisionTree.createdAt)}
+              </TableCell>
               <TableCell colSpan={2}>
                 <div className="flex items-center justify-end gap-2">
                   <Button
@@ -73,6 +82,7 @@ const Home = () => {
                     onClick={() => handleClickDelete(decisionTree.id)}
                     size="icon"
                     variant="destructive"
+                    disabled={isDeleteLoading}
                   >
                     <Trash2Icon />
                   </Button>

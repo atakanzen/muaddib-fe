@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { LoaderCircleIcon } from "lucide-react";
 import {
   ChangeEventHandler,
   FormEventHandler,
@@ -116,8 +117,8 @@ const Auth = () => {
             disabled={isPending}
             size="lg"
           >
-            {" "}
-            {isLogin ? "Login" : "Sign Up"}
+            {isPending && <LoaderCircleIcon className="animate-spin" />}
+            {isPending ? null : isLogin ? "Login" : "Sign Up"}
           </Button>
 
           {error && <p className="text-red-500 text-center">{error}</p>}
