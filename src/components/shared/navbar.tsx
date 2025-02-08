@@ -14,6 +14,10 @@ const links = [
     url: "/about-us",
     title: "About Us",
   },
+  {
+    url: "/documentation",
+    title: "Documentation",
+  },
 ];
 
 const Navbar = () => {
@@ -46,13 +50,10 @@ const Navbar = () => {
   const userInitial = username ? username.charAt(0).toUpperCase() : "";
 
   return (
-    <div className="absolute z-50 top-0 left-0 w-full h-20 bg-white border-b-4 border-black flex items-center justify-between p-4">
-      <div className="flex items-center justify-center gap-2">
+    <div className="fixed z-50 top-0 left-0 w-full h-20 bg-white border-b-4 border-black flex items-center justify-between p-4">
+      <div className="flex items-center justify-center gap-2 divide-x-2 divide-black">
         <h1 className="font-serif font-extrabold text-2xl ">Muad'dib</h1>
-        <p className="text-gray-400">subject to change</p>
-      </div>
-      <div className="text-xl">
-        <nav className="flex gap-2">
+        <nav className="flex gap-2 pl-2 text-lg">
           {links.map((li) => (
             <NavLink
               key={li.url}
@@ -69,6 +70,7 @@ const Navbar = () => {
           ))}
         </nav>
       </div>
+      <div className="text-xl"></div>
       <div className="flex items-center gap-4">
         <Button variant="outline" onClick={handleSignOut}>
           Sign Out

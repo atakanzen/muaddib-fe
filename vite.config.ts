@@ -7,6 +7,7 @@ const port = process.env.NODE_ENV === "production" ? 8080 : 3000;
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  assetsInclude: ["**/*.md"],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
