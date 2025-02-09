@@ -14,69 +14,133 @@ import {
   SidebarMenuSubItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { useState } from "react";
+
+interface SidebarLink {
+  id: string;
+  title: string;
+  url: string;
+  isActive: boolean;
+  items?: SidebarLink[];
+}
+
+interface SidebarData {
+  navMain: SidebarLink[];
+}
 
 // This is sample data.
-const data = {
+const data: SidebarData = {
   navMain: [
     {
+      id: "1",
       title: "Getting Started",
       url: "#getting-started",
       items: [
         {
+          id: "1.2",
           title: "Introduction",
           url: "#introduction",
+          isActive: false,
         },
       ],
+      isActive: false,
     },
     {
+      id: "2",
       title: "Decision Trees",
-      url: "#",
+      url: "#decision-trees",
       items: [
         {
+          id: "2.1",
           title: "Creating Decision Trees",
-          url: "#",
+          url: "#creating-decision-trees",
+          isActive: false,
         },
         {
+          id: "2.2",
           title: "Deleting Decision Trees",
-          url: "#",
-          isActive: true,
+          url: "#deleting-decision-trees",
+          isActive: false,
         },
         {
+          id: "2.3",
           title: "Editing Decision Trees",
-          url: "#",
+          url: "#editing-decision-trees",
+          isActive: false,
         },
       ],
+      isActive: false,
     },
     {
+      id: "3",
       title: "Decision Tree Editor",
-      url: "#",
+      url: "#decision-tree-editor",
       items: [
         {
+          id: "3.1",
           title: "Adding Nodes",
-          url: "#",
+          url: "#adding-nodes",
+          isActive: false,
         },
         {
+          id: "3.2",
           title: "Managing Nodes",
-          url: "#",
+          url: "#managing-nodes",
+          isActive: false,
         },
       ],
+      isActive: false,
     },
     {
+      id: "4",
       title: "Further Questions",
-      url: "#",
+      url: "#further-questions",
       items: [
         {
+          id: "4.1",
           title: "Contact Us",
-          url: "#",
+          url: "#contact-us",
+          isActive: false,
         },
       ],
+      isActive: false,
     },
   ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [navData, setNavData] = useState<SidebarData>(data);
+
+  const handleOnClickLink = (
+    itemURL: string,
+    itemID: string,
+    e: React.MouseEvent<HTMLAnchorElement>
+  ) => {
+    e.preventDefault();
+
+    const clickedAnchor = document.querySelector(
+      `h2 > a[href='${itemURL}'], h3 > a[href='${itemURL}']`
+    );
+    if (clickedAnchor) {
+      clickedAnchor.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
+
+    window.history.pushState(null, "", itemURL);
+
+    setNavData((prevData) => ({
+      navMain: prevData.navMain.map((item) => ({
+        ...item,
+        isActive: item.id === itemID,
+        items: item.items?.map((subItem) => ({
+          ...subItem,
+          isActive: subItem.id === itemID,
+        })),
+      })),
+    }));
+  };
+
   return (
-    <Sidebar {...props} className="mt-24">
+    <Sidebar {...props} className="mt-20">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -97,10 +161,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
-            {data.navMain.map((item) => (
+            {navData.navMain.map((item) => (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild>
-                  <a href={item.url} className="font-medium">
+                <SidebarMenuButton asChild isActive={item.isActive}>
+                  <a
+                    onClick={(e) => handleOnClickLink(item.url, item.id, e)}
+                    href={item.url}
+                    className="font-medium"
+                  >
                     {item.title}
                   </a>
                 </SidebarMenuButton>
@@ -109,7 +177,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     {item.items.map((item) => (
                       <SidebarMenuSubItem key={item.title}>
                         <SidebarMenuSubButton asChild isActive={item.isActive}>
-                          <a href={item.url}>{item.title}</a>
+                          <a
+                            onClick={(e) =>
+                              handleOnClickLink(item.url, item.id, e)
+                            }
+                            href={item.url}
+                          >
+                            {item.title}
+                          </a>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}
